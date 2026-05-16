@@ -66,11 +66,6 @@
             user-select: none;
         }
 
-        .sidebar-container th {
-            font-weight: 700 !important;
-            color: #1e293b;
-        }
-
         td {
             padding: 8px 12px;
             border-bottom: 1px solid var(--border-color);
@@ -79,7 +74,6 @@
             transition: background 0.05s;
             color: #1e293b;
             position: relative;
-            cursor: cell;
         }
 
         td:last-child, th:last-child { border-right: none; }
@@ -166,9 +160,6 @@
             font-size: 0.7rem;
         }
 
-        .sidebar-container { width: 340px; flex-shrink: 0; }
-        .main-list-container { flex-grow: 1; margin-left: 30px; }
-
         #pdfTemplate {
             display: none;
             width: 500px;
@@ -198,21 +189,21 @@
             <h1 class="text-2xl font-bold tracking-tight">Board Eligibility Console</h1>
         </div>
         <div class="text-right">
-            <div class="text-[9px] bg-white/20 px-2 py-0.5 rounded text-white font-bold uppercase">Standalone Mode</div>
-            <div class="text-[10px] text-white/70 italic">Local PC Storage Only</div>
+            <div class="text-[9px] bg-white/20 px-2 py-0.5 rounded text-white font-bold uppercase tracking-widest">Independent Work Mode</div>
+            <div class="text-[10px] text-white/70 italic">Local Browser Cache Enabled</div>
         </div>
     </div>
 
     <div class="flex p-8 items-start">
-        <!-- Input Sidebar -->
-        <div class="sidebar-container space-y-6">
+        <!-- Sidebar Input Section -->
+        <div class="w-[340px] space-y-6 flex-shrink-0">
             <div class="glass-panel">
                 <table class="w-full">
                     <tr>
-                        <th style="width: 100px;">Target</th>
-                        <td class="flex items-center space-x-2">
-                            <input type="number" id="inputPoints" placeholder="Points" value="3000" class="text-blue-600 font-bold focusable">
-                            <span class="text-gray-400 font-bold text-xs">Pts</span>
+                        <th class="w-24">Target</th>
+                        <td class="flex items-center">
+                            <input type="number" id="inputPoints" value="3000" class="text-blue-600 font-bold focusable">
+                            <span class="text-gray-400 font-bold text-xs pr-2">Pts</span>
                         </td>
                     </tr>
                 </table>
@@ -220,45 +211,32 @@
 
             <div class="glass-panel">
                 <table class="w-full">
-                    <tr>
-                        <th style="width: 100px;">Mobile</th>
-                        <td><input type="text" id="inputMobile" placeholder="Enter Mobile No." class="focusable"></td>
-                    </tr>
+                    <tr><th class="w-24">Mobile</th><td><input type="text" id="inputMobile" placeholder="Mobile Number" class="focusable"></td></tr>
                     <tr>
                         <th>Category</th>
                         <td>
-                            <select id="inputCategory" onchange="updateCategoryLabels()" class="cursor-pointer focusable">
-                                <option value="">Select Category</option>
+                            <select id="inputCategory" onchange="updateCategoryLabels()" class="focusable">
                                 <option value="Retailer">Retailer</option>
                                 <option value="Dealer">Dealer</option>
                                 <option value="Distributor">Distributor</option>
                             </select>
                         </td>
                     </tr>
-                    <tr><th>Shop name</th><td><input type="text" id="inputShop" placeholder="Shop Name" class="focusable"></td></tr>
+                    <tr><th>Shop</th><td><input type="text" id="inputShop" placeholder="Shop Name" class="focusable"></td></tr>
                     <tr><th>City</th><td><input type="text" id="inputCity" placeholder="City" class="focusable"></td></tr>
                     <tr><th>District</th><td><input type="text" id="inputDistrict" placeholder="District" class="focusable"></td></tr>
                 </table>
             </div>
 
             <div class="glass-panel">
-                <div class="px-3 py-2 bg-slate-100 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Points Breakdown</div>
+                <div class="px-3 py-2 bg-slate-50 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Breakdown</div>
                 <table class="w-full">
-                    <tr class="bg-amber-50/50">
-                        <th style="width: 100px;">RRP (OLD)</th>
-                        <td><input type="number" id="inputRRP" placeholder="0" class="focusable"></td>
-                    </tr>
-                    <tr>
-                        <th id="catLabel1">GSD</th>
-                        <td><input type="text" id="perfInput1" placeholder="0" class="focusable"></td>
-                    </tr>
-                    <tr>
-                        <th id="catLabel2">RRP-GSD</th>
-                        <td><input type="text" id="perfInput2" placeholder="0" class="focusable"></td>
-                    </tr>
+                    <tr class="bg-amber-50/30"><th class="w-24">RRP (OLD)</th><td><input type="number" id="inputRRP" placeholder="0" class="focusable"></td></tr>
+                    <tr><th id="catLabel1">GSD</th><td><input type="text" id="perfInput1" placeholder="0" class="focusable"></td></tr>
+                    <tr><th id="catLabel2">RRP-GSD</th><td><input type="text" id="perfInput2" placeholder="0" class="focusable"></td></tr>
                     <tr class="bg-blue-50/30">
                         <th>
-                            <select id="selectMainMonth" onchange="handleMonthChange()" class="bg-transparent p-0 h-auto cursor-pointer focusable">
+                            <select id="selectMainMonth" onchange="handleMonthChange()" class="p-0 h-auto font-bold focusable">
                                 <option value="Jan">Jan</option><option value="Feb">Feb</option><option value="Mar">Mar</option>
                                 <option value="Apr">Apr</option><option value="May">May</option><option value="Jun">Jun</option>
                                 <option value="Jul" selected>Jul</option><option value="Aug">Aug</option><option value="Sep">Sep</option>
@@ -277,305 +255,281 @@
                     <tr><th id="labelMonth4">Apr</th><td><div class="smart-cell-container"><input type="text" class="month-input focusable" id="valMonth4" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
                 </table>
                 <div class="p-2 bg-slate-50 border-t border-slate-200">
-                    <button onclick="clearCurrentForm()" class="w-full py-2 text-[11px] font-bold text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-all uppercase tracking-wider">
-                        Clear Form
-                    </button>
+                    <button onclick="clearForm()" class="w-full py-1.5 text-[10px] font-bold text-red-500 hover:bg-red-50 rounded uppercase">Clear Form</button>
                 </div>
             </div>
-            
+
             <div class="flex flex-col space-y-3">
-                <button class="btn-action btn-add w-full py-3" id="btnAddRecord" onclick="addRow()">Add Record</button>
-                <button class="btn-action w-full" onclick="printReport()">Download PDF Report</button>
+                <button class="btn-action btn-add w-full py-3" onclick="addRecord()">Add Record</button>
+                <button class="btn-action w-full" onclick="printReport()">Download PDF</button>
             </div>
         </div>
 
-        <!-- Local History -->
-        <div class="main-list-container space-y-6">
+        <!-- History List Section -->
+        <div class="flex-grow ml-8 space-y-6">
+            <!-- Current Status Preview -->
             <div class="glass-panel border-blue-200 bg-blue-50/20">
-                 <div class="px-4 py-2 bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest">Entry Preview</div>
-                 <table class="w-full">
+                <div class="px-4 py-2 bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest">Live Entry Status</div>
+                <table class="w-full">
                     <thead>
                         <tr>
                             <th style="width: 30%;">Shop / Mobile</th>
                             <th style="width: 15%;">RRP (OLD)</th>
-                            <th style="width: 15%;">Actual Points</th>
+                            <th style="width: 15%;">Actual</th>
                             <th style="width: 15%;">3 Month Final</th>
                             <th class="text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="h-16">
-                            <td id="previewMobile" class="text-[12px] font-bold">-</td>
-                            <td id="previewRRPDisplay" class="text-[12px] font-medium">0</td>
-                            <td id="previewGSDTotal" class="text-[12px] font-medium">0</td>
-                            <td id="preview3Months" class="text-[12px] font-bold text-blue-700">0</td>
-                            <td id="previewStatus" class="text-center px-4"></td>
+                        <tr class="h-14">
+                            <td id="prevShop" class="font-bold text-sm">-</td>
+                            <td id="prevRRP" class="text-sm">0</td>
+                            <td id="prevActual" class="text-sm">0</td>
+                            <td id="prevFinal" class="font-bold text-blue-700 text-sm">0</td>
+                            <td id="prevStatus" class="px-4"></td>
                         </tr>
                     </tbody>
-                 </table>
+                </table>
             </div>
 
+            <!-- Table of History -->
             <div class="glass-panel">
                 <div class="px-4 py-3 bg-white border-b border-slate-200 flex justify-between items-center">
-                    <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Session History</h2>
-                    <div class="flex space-x-4">
-                        <button onclick="copyTableData()" class="text-[10px] font-bold text-blue-600 hover:underline">COPY CSV</button>
-                        <button onclick="clearAllRecords()" class="text-[10px] font-bold text-red-500 hover:underline">CLEAR LIST</button>
-                    </div>
+                    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Entry History (This Browser Only)</h2>
+                    <button onclick="clearHistory()" class="text-[10px] font-bold text-red-500 hover:underline uppercase">Clear List</button>
                 </div>
-                <div class="max-h-[600px] overflow-y-auto">
+                <div class="overflow-x-auto">
                     <table class="w-full">
-                        <thead class="sticky top-0 z-20">
+                        <thead>
                             <tr>
                                 <th>Shop Name</th>
                                 <th>Mobile</th>
                                 <th>Location</th>
                                 <th>RRP</th>
-                                <th>3M Sum</th>
-                                <th>Actual</th>
+                                <th>3M Final</th>
                                 <th>Status</th>
                                 <th style="width: 50px;"></th>
                             </tr>
                         </thead>
-                        <tbody id="recordsBody"></tbody>
+                        <tbody id="historyBody">
+                            <!-- Rows go here -->
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- PDF Template -->
+    <!-- Hidden PDF Export -->
     <div id="pdfTemplate">
         <div class="pdf-box">
             <div class="pdf-header">Board Eligibility Status</div>
-            <div id="pdfStatusColor" class="pdf-status-bar"></div>
+            <div id="pdfStatusBar" class="pdf-status-bar"></div>
             <div class="pdf-row"><div class="pdf-label">Mobile No</div><div id="pdfMobile" class="pdf-value"></div></div>
-            <div class="pdf-row"><div class="pdf-label">Category</div><div id="pdfCategory" class="pdf-value"></div></div>
-            <div class="pdf-row"><div class="pdf-label">Shop name</div><div id="pdfShop" class="pdf-value"></div></div>
-            <div class="pdf-row"><div class="pdf-label">City</div><div id="pdfCity" class="pdf-value"></div></div>
-            <div class="pdf-row"><div class="pdf-label">District</div><div id="pdfDistrict" class="pdf-value"></div></div>
+            <div class="pdf-row"><div class="pdf-label">Shop Name</div><div id="pdfShop" class="pdf-value"></div></div>
+            <div class="pdf-row"><div class="pdf-label">Location</div><div id="pdfLocation" class="pdf-value"></div></div>
             <div class="pdf-grid-3">
                 <div class="pdf-grid-col">
                     <div class="pdf-grid-label">RRP(OLD)</div>
-                    <div class="pdf-grid-sub">TOTAL</div>
-                    <div id="pdfRRP" class="pdf-grid-value">0</div>
+                    <div id="pdfValRRP" class="pdf-grid-value">0</div>
                 </div>
                 <div class="pdf-grid-col">
-                    <div id="pdfGSDLabel" class="pdf-grid-label">GSD</div>
-                    <div class="pdf-grid-sub">ACTUAL POINTS</div>
-                    <div id="pdfGSD" class="pdf-grid-value">0</div>
+                    <div id="pdfCatHeader" class="pdf-grid-label">GSD</div>
+                    <div id="pdfValActual" class="pdf-grid-value">0</div>
                 </div>
                 <div class="pdf-grid-col">
-                    <div class="pdf-grid-label">3MONTHS</div>
-                    <div class="pdf-grid-sub">FINAL TOTAL</div>
-                    <div id="pdf3Months" class="pdf-grid-value">0</div>
+                    <div class="pdf-grid-label">3M FINAL</div>
+                    <div id="pdfValFinal" class="pdf-grid-value">0</div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // DOM Elements
-        const mobileIn = document.getElementById('inputMobile');
-        const shopIn = document.getElementById('inputShop');
-        const cityIn = document.getElementById('inputCity');
-        const districtIn = document.getElementById('inputDistrict');
-        const rrpIn = document.getElementById('inputRRP');
-        const catIn = document.getElementById('inputCategory');
-        const pointsIn = document.getElementById('inputPoints');
-        const monthSel = document.getElementById('selectMainMonth');
-        const monthIns = document.querySelectorAll('.month-input');
-        const perfIn1 = document.getElementById('perfInput1');
-        const perfIn2 = document.getElementById('perfInput2');
-        const recordsBody = document.getElementById('recordsBody');
-
         const monthsOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        let localRecords = [];
+        let localData = [];
 
-        // --- MATH ---
-        function calculateExpr(text) {
-            if (!text || !text.trim()) return 0;
+        // Elements
+        const mobileEl = document.getElementById('inputMobile');
+        const shopEl = document.getElementById('inputShop');
+        const cityEl = document.getElementById('inputCity');
+        const distEl = document.getElementById('inputDistrict');
+        const rrpEl = document.getElementById('inputRRP');
+        const catEl = document.getElementById('inputCategory');
+        const targetEl = document.getElementById('inputPoints');
+        const monthSel = document.getElementById('selectMainMonth');
+        const p1El = document.getElementById('perfInput1');
+        const p2El = document.getElementById('perfInput2');
+        const monthInputs = document.querySelectorAll('.month-input');
+        const historyBody = document.getElementById('historyBody');
+
+        function parse(val) {
+            if (!val || !val.toString().trim()) return 0;
             try {
-                const sanitized = String(text).replace(/[^0-9+\-*/().\s]/g, '');
-                return new Function(`return ${sanitized || '0'}`)() || 0;
-            } catch (e) { return 0; }
+                return new Function(`return ${val.toString().replace(/[^0-9+\-*/().\s]/g, '') || '0'}`)() || 0;
+            } catch { return 0; }
         }
 
         function updateCalculations() {
-            const rrp = parseFloat(rrpIn.value) || 0;
-            const target = parseFloat(pointsIn.value) || 0;
-            const p1 = calculateExpr(perfIn1.value);
-            const p2 = calculateExpr(perfIn2.value);
-            
+            const rrp = parseFloat(rrpEl.value) || 0;
+            const target = parseFloat(targetEl.value) || 0;
+            const p1 = parse(p1El.value);
+            const p2 = parse(p2El.value);
             const actualTotal = p1 - p2;
-            let deduction = 0; 
-            monthIns.forEach(i => deduction += calculateExpr(i.value));
-            const final3M = actualTotal - deduction;
+
+            let monthSum = 0;
+            monthInputs.forEach(i => monthSum += parse(i.value));
+            const final3M = actualTotal - monthSum;
 
             let status = "NOT ELIGIBLE";
-            if (rrp >= target) status = "ELIGIBLE (BY RRP)";
-            else if (p1 >= target) status = "ELIGIBLE (BY " + document.getElementById('catLabel1').innerText + ")";
-            else if (final3M >= target) status = "ELIGIBLE (3 MONTHS)";
+            if (rrp >= target) status = "ELIGIBLE (RRP)";
+            else if (p1 >= target) status = "ELIGIBLE (" + document.getElementById('catLabel1').innerText + ")";
+            else if (final3M >= target) status = "ELIGIBLE (3M)";
 
-            document.getElementById('previewMobile').innerText = mobileIn.value ? `${shopIn.value || 'Shop'} (${mobileIn.value})` : "-";
-            document.getElementById('previewRRPDisplay').innerText = rrp.toLocaleString();
-            document.getElementById('previewGSDTotal').innerText = actualTotal.toLocaleString();
-            document.getElementById('preview3Months').innerText = final3M.toLocaleString();
+            // Update Preview
+            document.getElementById('prevShop').innerText = mobileEl.value ? `${shopEl.value || 'Shop'} (${mobileEl.value})` : "-";
+            document.getElementById('prevRRP').innerText = rrp.toLocaleString();
+            document.getElementById('prevActual').innerText = actualTotal.toLocaleString();
+            document.getElementById('prevFinal').innerText = final3M.toLocaleString();
             
-            const ps = document.getElementById('previewStatus');
+            const ps = document.getElementById('prevStatus');
             ps.innerText = status;
-            ps.className = "text-center px-4 " + (status.includes("ELIGIBLE") ? "status-eligible" : "status-not-eligible");
+            ps.className = status.includes("ELIGIBLE") ? "status-eligible" : "status-not-eligible";
+
+            return { rrp, actualTotal, final3M, status };
         }
 
-        // --- LOCAL STORAGE SIMULATION (RAM ONLY) ---
-        function addRow() {
-            if (!mobileIn.value) return;
-            const rec = {
+        function addRecord() {
+            if (!mobileEl.value) return;
+            const res = updateCalculations();
+            
+            const newRecord = {
                 id: Date.now(),
-                shop: shopIn.value,
-                mobile: mobileIn.value,
-                city: cityIn.value,
-                district: districtIn.value,
-                rrp: rrpIn.value || 0,
-                sum3m: document.getElementById('preview3Months').innerText,
-                actual: document.getElementById('previewGSDTotal').innerText,
-                status: document.getElementById('previewStatus').innerText
+                shop: shopEl.value || "Unknown",
+                mobile: mobileEl.value,
+                location: `${cityEl.value}${cityEl.value && distEl.value ? ', ' : ''}${distEl.value}`,
+                rrp: res.rrp,
+                final: res.final3M,
+                status: res.status
             };
-            localRecords.unshift(rec);
-            renderTable();
-            clearCurrentForm();
+
+            localData.unshift(newRecord);
+            renderHistory();
+            clearForm();
         }
 
-        function renderTable() {
-            recordsBody.innerHTML = '';
-            if (localRecords.length === 0) {
-                initEmptyRows();
+        function renderHistory() {
+            historyBody.innerHTML = '';
+            if (localData.length === 0) {
+                for(let i=0; i<8; i++) {
+                    const tr = document.createElement('tr');
+                    tr.className = "opacity-20 h-10";
+                    tr.innerHTML = '<td></td><td></td><td></td><td></td><td></td><td></td><td></td>';
+                    historyBody.appendChild(tr);
+                }
                 return;
             }
-            localRecords.forEach(rec => {
+
+            localData.forEach(item => {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td class="font-medium">${rec.shop || '-'}</td>
-                    <td>${rec.mobile}</td>
-                    <td class="text-[11px] text-slate-500">${rec.city || '-'}, ${rec.district || '-'}</td>
-                    <td>${rec.rrp || 0}</td>
-                    <td>${rec.sum3m || 0}</td>
-                    <td>${rec.actual || 0}</td>
-                    <td class="p-2"><div class="${rec.status.includes('ELIGIBLE') ? 'status-eligible' : 'status-not-eligible'}">${rec.status}</div></td>
+                    <td class="font-bold text-sm">${item.shop}</td>
+                    <td class="text-sm">${item.mobile}</td>
+                    <td class="text-xs text-slate-500">${item.location || '-'}</td>
+                    <td class="text-sm">${item.rrp.toLocaleString()}</td>
+                    <td class="text-sm font-bold text-blue-700">${item.final.toLocaleString()}</td>
+                    <td><div class="${item.status.includes('ELIGIBLE') ? 'status-eligible' : 'status-not-eligible'}">${item.status}</div></td>
                     <td class="text-center">
-                        <button onclick="deleteLocal('${rec.id}')" class="text-red-300 hover:text-red-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                        </button>
+                        <button onclick="removeRecord(${item.id})" class="text-red-300 hover:text-red-500">×</button>
                     </td>
                 `;
-                recordsBody.appendChild(tr);
+                historyBody.appendChild(tr);
             });
         }
 
-        function deleteLocal(id) {
-            localRecords = localRecords.filter(r => r.id != id);
-            renderTable();
+        function removeRecord(id) {
+            localData = localData.filter(i => i.id !== id);
+            renderHistory();
         }
 
-        function clearAllRecords() {
-            localRecords = [];
-            renderTable();
+        function clearHistory() {
+            localData = [];
+            renderHistory();
         }
 
-        function clearCurrentForm() {
-            [mobileIn, shopIn, cityIn, districtIn, rrpIn, perfIn1, perfIn2].forEach(i => i.value = "");
-            monthIns.forEach(i => {
+        function clearForm() {
+            [mobileEl, shopEl, cityEl, distEl, rrpEl, p1El, p2El].forEach(i => i.value = "");
+            monthInputs.forEach(i => {
                 i.value = "";
                 i.closest('.smart-cell-container').classList.remove('has-sum');
-                i.closest('.smart-cell-container').querySelector('.sum-indicator').innerText = "0";
             });
             updateCalculations();
-            mobileIn.focus();
+            mobileEl.focus();
         }
 
-        // --- UTILS ---
         function handleMonthChange() {
             const idx = monthsOrder.indexOf(monthSel.value);
-            const getPrev = (i, off) => { let t = i - off; while(t < 0) t += 12; return monthsOrder[t]; };
-            document.getElementById('labelMonth2').innerText = getPrev(idx, 1);
-            document.getElementById('labelMonth3').innerText = getPrev(idx, 2);
-            document.getElementById('labelMonth4').innerText = getPrev(idx, 3);
+            const getP = (i, o) => monthsOrder[(i - o + 12) % 12];
+            document.getElementById('labelMonth2').innerText = getP(idx, 1);
+            document.getElementById('labelMonth3').innerText = getP(idx, 2);
+            document.getElementById('labelMonth4').innerText = getP(idx, 3);
             updateCalculations();
         }
 
         function updateCategoryLabels() {
-            const cat = catIn.value;
+            const cat = catEl.value;
             const l1 = document.getElementById('catLabel1'), l2 = document.getElementById('catLabel2');
-            if (cat === "Distributor") { l1.innerText = "GDP"; l2.innerText = "RRP-GDP"; perfIn2.disabled = false; }
-            else if (cat === "Dealer") { l1.innerText = "GRP"; l2.innerText = "N/A"; perfIn2.disabled = true; perfIn2.value = ""; }
-            else { l1.innerText = "GSD"; l2.innerText = "RRP-GSD"; perfIn2.disabled = false; }
+            if (cat === "Distributor") { l1.innerText = "GDP"; l2.innerText = "RRP-GDP"; p2El.disabled = false; }
+            else if (cat === "Dealer") { l1.innerText = "GRP"; l2.innerText = "N/A"; p2El.disabled = true; p2El.value = ""; }
+            else { l1.innerText = "GSD"; l2.innerText = "RRP-GSD"; p2El.disabled = false; }
             updateCalculations();
-        }
-
-        function setupNavigation() {
-            const focusables = Array.from(document.querySelectorAll('.focusable'));
-            focusables.forEach((el, index) => {
-                el.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') {
-                        e.preventDefault();
-                        const next = focusables[index + 1];
-                        if (next) next.focus();
-                        else addRow();
-                    }
-                });
-            });
         }
 
         function printReport() {
-            if (!mobileIn.value) return;
-            const status = document.getElementById('previewStatus').innerText;
-            document.getElementById('pdfMobile').innerText = mobileIn.value;
-            document.getElementById('pdfCategory').innerText = catIn.value || "-";
-            document.getElementById('pdfShop').innerText = shopIn.value || "-";
-            document.getElementById('pdfCity').innerText = cityIn.value || "-";
-            document.getElementById('pdfDistrict').innerText = districtIn.value || "-";
-            document.getElementById('pdfRRP').innerText = rrpIn.value || "0";
-            document.getElementById('pdfGSD').innerText = document.getElementById('previewGSDTotal').innerText;
-            document.getElementById('pdf3Months').innerText = document.getElementById('preview3Months').innerText;
-            document.getElementById('pdfGSDLabel').innerText = document.getElementById('catLabel1').innerText;
-            const pc = document.getElementById('pdfStatusColor');
-            pc.innerText = status;
-            pc.style.backgroundColor = status.includes("ELIGIBLE") ? "#059669" : "#dc2626";
+            if (!mobileEl.value) return;
+            const res = updateCalculations();
+            document.getElementById('pdfMobile').innerText = mobileEl.value;
+            document.getElementById('pdfShop').innerText = shopEl.value || "-";
+            document.getElementById('pdfLocation').innerText = `${cityEl.value}, ${distEl.value}`;
+            document.getElementById('pdfValRRP').innerText = res.rrp.toLocaleString();
+            document.getElementById('pdfValActual').innerText = res.actualTotal.toLocaleString();
+            document.getElementById('pdfValFinal').innerText = res.final3M.toLocaleString();
+            document.getElementById('pdfCatHeader').innerText = document.getElementById('catLabel1').innerText;
+            
+            const bar = document.getElementById('pdfStatusBar');
+            bar.innerText = res.status;
+            bar.style.backgroundColor = res.status.includes("ELIGIBLE") ? "#059669" : "#dc2626";
+
             const element = document.getElementById('pdfTemplate');
             element.style.display = 'block';
-            html2pdf().set({ filename: `Report_${mobileIn.value}.pdf`, html2canvas: { scale: 2 } }).from(element).save().then(() => element.style.display = 'none');
+            html2pdf().from(element).set({ filename: `Status_${mobileEl.value}.pdf` }).save().then(() => element.style.display='none');
         }
 
-        function copyTableData() {
-            let csv = "Shop Name,Mobile,Location,RRP,3M Sum,Actual,Status\n";
-            localRecords.forEach(rec => {
-                csv += `${rec.shop},${rec.mobile},${rec.city}-${rec.district},${rec.rrp},${rec.sum3m},${rec.actual},${rec.status}\n`;
-            });
-            const t = document.createElement('textarea'); t.value = csv; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t);
-        }
-
-        function initEmptyRows() { 
-            for(let i=0; i<8; i++) { 
-                const tr = document.createElement('tr'); tr.className = "opacity-20 h-10"; 
-                tr.innerHTML = '<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>'; 
-                recordsBody.appendChild(tr); 
-            } 
-        }
-
-        // Init
-        [mobileIn, shopIn, cityIn, districtIn, rrpIn, pointsIn, perfIn1, perfIn2].forEach(el => el.addEventListener('input', updateCalculations));
-        monthIns.forEach(input => input.addEventListener('input', (e) => {
-            const c = e.target.closest('.smart-cell-container');
-            const s = calculateExpr(e.target.value);
-            c.querySelector('.sum-indicator').innerText = s;
-            if (e.target.value.includes('+')) c.classList.add('has-sum'); else c.classList.remove('has-sum');
+        // Event Listeners
+        [mobileEl, shopEl, cityEl, distEl, rrpEl, targetEl, p1El, p2El].forEach(el => el.addEventListener('input', updateCalculations));
+        monthInputs.forEach(input => input.addEventListener('input', (e) => {
+            const container = e.target.closest('.smart-cell-container');
+            container.querySelector('.sum-indicator').innerText = parse(e.target.value);
+            if (e.target.value.includes('+')) container.classList.add('has-sum');
+            else container.classList.remove('has-sum');
             updateCalculations();
         }));
 
-        initEmptyRows();
-        handleMonthChange();
+        // Enter key navigation
+        document.querySelectorAll('.focusable').forEach((el, i, arr) => {
+            el.addEventListener('keydown', e => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (arr[i+1]) arr[i+1].focus();
+                    else addRecord();
+                }
+            });
+        });
+
+        // Initialize
+        renderHistory();
         updateCategoryLabels();
-        setupNavigation();
+        handleMonthChange();
     </script>
 </body>
 </html>
