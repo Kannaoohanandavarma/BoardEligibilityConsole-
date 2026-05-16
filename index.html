@@ -5,6 +5,378 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Board Eligibility Check Console</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --bg-gray: #f8fafc;
+            --border-color: #000000;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-gray);
+            color: #1e293b;
+            overflow-x: hidden;
+            user-select: text;
+        }
+
+        .header-banner {
+            background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+            color: white;
+            padding: 0.75rem 2.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .header-logo {
+            height: 50px;
+            width: auto;
+            background: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+
+        .glass-panel {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #000;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            overflow: hidden;
+        }
+
+        /* Card Layout Styling from Screenshot */
+        .status-card {
+            width: 100%;
+            max-width: 450px;
+            border: 2px solid #000;
+            background: #fff;
+        }
+
+        .status-header {
+            background: #e2e8f0;
+            border-bottom: 2px solid #000;
+            text-align: center;
+            font-weight: 800;
+            padding: 4px;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .status-bar {
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 800;
+            font-size: 13px;
+            border-bottom: 2px solid #000;
+            transition: background 0.3s;
+        }
+
+        .status-bar.not-eligible { background: #ff0000; }
+        .status-bar.eligible { background: #059669; }
+
+        .card-table { width: 100%; border-collapse: collapse; }
+        .card-table td {
+            border: 1px solid #000;
+            padding: 6px 10px;
+            font-size: 13px;
+        }
+        .card-table .label { font-weight: 700; width: 35%; }
+        
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            text-align: center;
+            background: #fffbeb;
+        }
+        .footer-cell { border: 1px solid #000; padding: 4px; }
+        .footer-label { font-weight: 700; font-size: 11px; border-bottom: 1px solid #000; }
+        .footer-val { font-weight: 800; font-size: 14px; padding: 5px 0; }
+        .highlight-yellow { background: #ffff00; }
+
+        /* Sidebar/Form Styling */
+        th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            padding: 8px;
+            border-bottom: 1px solid #cbd5e1;
+            border-right: 1px solid #cbd5e1;
+        }
+
+        td {
+            padding: 4px 8px;
+            border-bottom: 1px solid #cbd5e1;
+            border-right: 1px solid #cbd5e1;
+        }
+
+        input, select {
+            width: 100%;
+            border: 1px solid transparent;
+            outline: none;
+            background: transparent;
+            font-size: 13px;
+        }
+
+        .btn-action {
+            background-color: white;
+            color: #1e293b;
+            border: 1px solid #000;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-add { background-color: #2563eb; color: white; border: none; }
+
+        .sidebar-container { width: 320px; }
+        .main-container { flex-grow: 1; margin-left: 30px; }
+    </style>
+</head>
+<body class="p-0 m-0">
+
+    <div class="header-banner flex justify-between items-center">
+        <div class="flex items-center space-x-6">
+            <div class="header-logo flex items-center justify-center font-bold text-blue-800">GOLDMEDAL</div>
+            <h1 class="text-xl font-bold tracking-tight">Board Eligibility Console</h1>
+        </div>
+        <div class="text-xs opacity-80">PRO v4.0</div>
+    </div>
+
+    <div class="flex p-6 items-start">
+        
+        <!-- Left Sidebar Form -->
+        <div class="sidebar-container space-y-4">
+            <div class="glass-panel">
+                <table class="w-full">
+                    <tr><th style="width: 100px;">Target Pts</th><td><input type="number" id="inputPoints" value="3000" class="font-bold text-blue-600"></td></tr>
+                </table>
+            </div>
+
+            <div class="glass-panel">
+                <div class="px-3 py-1 bg-slate-100 border-b border-black text-[10px] font-bold">IDENTITY</div>
+                <table class="w-full">
+                    <tr><th style="width: 100px;">Mobile</th><td><input type="text" id="inputMobile" placeholder="Number"></td></tr>
+                    <tr><th>Shop Name</th><td><input type="text" id="inputShop" placeholder="Shop Name"></td></tr>
+                    <tr><th>City</th><td><input type="text" id="inputCity" placeholder="City"></td></tr>
+                    <tr><th>District</th><td><input type="text" id="inputDistrict" placeholder="District"></td></tr>
+                    <tr>
+                        <th>Category</th>
+                        <td>
+                            <select id="inputCategory" onchange="updateLabels()">
+                                <option value="Retailer">Retailer</option>
+                                <option value="Dealer">Dealer</option>
+                                <option value="Distributor">Distributor</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="glass-panel">
+                <div class="px-3 py-1 bg-slate-100 border-b border-black text-[10px] font-bold">PERFORMANCE</div>
+                <table class="w-full">
+                    <tr><th>RRP (OLD)</th><td><input type="number" id="inputRRP" placeholder="0"></td></tr>
+                    <tr><th id="catLabel1">GSD</th><td><input type="number" id="perfInput1" placeholder="0"></td></tr>
+                    <tr><th id="catLabel2">RRP-GSD</th><td><input type="number" id="perfInput2" placeholder="0"></td></tr>
+                </table>
+            </div>
+
+            <div class="glass-panel">
+                <div class="px-3 py-1 bg-slate-100 border-b border-black text-[10px] font-bold">DEDUCTIONS (3 MONTHS)</div>
+                <table class="w-full">
+                    <tr>
+                        <th>
+                            <select id="selectMainMonth" onchange="handleMonthChange()" class="font-bold">
+                                <option value="Jan">Jan</option><option value="Feb">Feb</option><option value="Mar">Mar</option>
+                                <option value="Apr">Apr</option><option value="May">May</option><option value="Jun">Jun</option>
+                                <option value="Jul" selected>Jul</option><option value="Aug">Aug</option><option value="Sep">Sep</option>
+                                <option value="Oct">Oct</option><option value="Nov">Nov</option><option value="Dec">Dec</option>
+                            </select>
+                        </th>
+                        <td><input type="number" class="month-input" placeholder="0"></td>
+                    </tr>
+                    <tr><th id="labelMonth2">Jun</th><td><input type="number" class="month-input" placeholder="0"></td></tr>
+                    <tr><th id="labelMonth3">May</th><td><input type="number" class="month-input" placeholder="0"></td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Main Preview and Records -->
+        <div class="main-container space-y-6">
+            
+            <!-- Exact Replica Preview Card -->
+            <div class="status-card glass-panel mx-auto">
+                <div class="status-header">STATUS</div>
+                <div id="statusBar" class="status-bar not-eligible">NOT ELIGIBLE</div>
+                
+                <table class="card-table">
+                    <tr><td class="label">Mobile No</td><td id="cardMobile"></td></tr>
+                    <tr><td class="label">Category</td><td id="cardCategory">Retailer</td></tr>
+                    <tr><td class="label">Shop name</td><td id="cardShop"></td></tr>
+                    <tr><td class="label">City</td><td id="cardCity"></td></tr>
+                    <tr><td class="label">District</td><td id="cardDistrict"></td></tr>
+                </table>
+
+                <div class="footer-grid">
+                    <div class="footer-cell">
+                        <div class="footer-label">RRP(OLD)</div>
+                        <div class="footer-label">TOTAL</div>
+                        <div id="cardRRPTotal" class="footer-val highlight-yellow">0</div>
+                    </div>
+                    <div class="footer-cell">
+                        <div class="footer-label">GSD</div>
+                        <div class="footer-label">ACTUAL POINTS</div>
+                        <div id="cardGSDActual" class="footer-val">0</div>
+                    </div>
+                    <div class="footer-cell">
+                        <div class="footer-label">3MONTHS</div>
+                        <div class="footer-label">TOTAL</div>
+                        <div id="card3MonthTotal" class="footer-val highlight-yellow">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- List of Entries -->
+            <div class="glass-panel">
+                <div class="px-4 py-2 bg-slate-800 text-white text-[10px] font-bold uppercase">Record History</div>
+                <div class="max-h-[300px] overflow-y-auto">
+                    <table class="w-full text-xs">
+                        <thead class="sticky top-0 bg-white">
+                            <tr class="text-left">
+                                <th class="p-2">Mobile</th>
+                                <th class="p-2">Shop</th>
+                                <th class="p-2">RRP</th>
+                                <th class="p-2">GSD</th>
+                                <th class="p-2">3M Sum</th>
+                                <th class="p-2">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col space-y-3 ml-4">
+            <button class="btn-action btn-add" onclick="addRow()">Add Record</button>
+            <button class="btn-action" onclick="window.print()">Print Card</button>
+            <button class="btn-action" onclick="clearAll()">Clear All</button>
+        </div>
+    </div>
+
+    <script>
+        const inputs = ['inputMobile', 'inputShop', 'inputCity', 'inputDistrict', 'inputRRP', 'perfInput1', 'perfInput2', 'inputPoints'];
+        const monthsOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        function updateLabels() {
+            const cat = document.getElementById('inputCategory').value;
+            const l1 = document.getElementById('catLabel1');
+            const l2 = document.getElementById('catLabel2');
+            if(cat === "Distributor") { l1.innerText = "GDP"; l2.innerText = "RRP-GDP"; }
+            else if(cat === "Dealer") { l1.innerText = "GRP"; l2.innerText = "N/A"; }
+            else { l1.innerText = "GSD"; l2.innerText = "RRP-GSD"; }
+            updateCalculations();
+        }
+
+        function handleMonthChange() {
+            const sel = document.getElementById('selectMainMonth').value;
+            const idx = monthsOrder.indexOf(sel);
+            const getPrev = (o) => monthsOrder[(idx - o + 12) % 12];
+            document.getElementById('labelMonth2').innerText = getPrev(1);
+            document.getElementById('labelMonth3').innerText = getPrev(2);
+            updateCalculations();
+        }
+
+        function updateCalculations() {
+            const mobile = document.getElementById('inputMobile').value;
+            const shop = document.getElementById('inputShop').value;
+            const city = document.getElementById('inputCity').value;
+            const dist = document.getElementById('inputDistrict').value;
+            const cat = document.getElementById('inputCategory').value;
+            
+            const rrpVal = parseFloat(document.getElementById('inputRRP').value) || 0;
+            const gsdIn = parseFloat(document.getElementById('perfInput1').value) || 0;
+            const rrpGsd = parseFloat(document.getElementById('perfInput2').value) || 0;
+            const target = parseFloat(document.getElementById('inputPoints').value) || 0;
+            
+            const gsdTotal = gsdIn - rrpGsd;
+            
+            let deduction = 0;
+            document.querySelectorAll('.month-input').forEach(i => deduction += (parseFloat(i.value) || 0));
+            const threeMonthFinal = gsdTotal - deduction;
+
+            // UI Update
+            document.getElementById('cardMobile').innerText = mobile;
+            document.getElementById('cardShop').innerText = shop;
+            document.getElementById('cardCity').innerText = city;
+            document.getElementById('cardDistrict').innerText = dist;
+            document.getElementById('cardCategory').innerText = cat;
+            document.getElementById('cardRRPTotal').innerText = Math.round(rrpVal);
+            document.getElementById('cardGSDActual').innerText = Math.round(gsdTotal);
+            document.getElementById('card3MonthTotal').innerText = Math.round(threeMonthFinal);
+
+            const bar = document.getElementById('statusBar');
+            let status = "NOT ELIGIBLE";
+            
+            if (rrpVal >= target || gsdIn >= target) {
+                status = "ELIGIBLE";
+                bar.className = "status-bar eligible";
+            } else if (threeMonthFinal >= target) {
+                status = "ELIGIBLE (PRE-3M)";
+                bar.className = "status-bar eligible";
+            } else {
+                bar.className = "status-bar not-eligible";
+            }
+            bar.innerText = status;
+        }
+
+        function addRow() {
+            const body = document.getElementById('recordsBody');
+            const row = document.createElement('tr');
+            row.className = "border-b border-slate-100";
+            row.innerHTML = `
+                <td class="p-2">${document.getElementById('cardMobile').innerText}</td>
+                <td class="p-2">${document.getElementById('cardShop').innerText}</td>
+                <td class="p-2">${document.getElementById('cardRRPTotal').innerText}</td>
+                <td class="p-2">${document.getElementById('cardGSDActual').innerText}</td>
+                <td class="p-2">${document.getElementById('card3MonthTotal').innerText}</td>
+                <td class="p-2 font-bold ${document.getElementById('statusBar').innerText.includes('ELIGIBLE') ? 'text-green-600' : 'text-red-600'}">${document.getElementById('statusBar').innerText}</td>
+            `;
+            body.prepend(row);
+        }
+
+        function clearAll() {
+            document.getElementById('recordsBody').innerHTML = '';
+            inputs.forEach(id => document.getElementById(id).value = '');
+            document.querySelectorAll('.month-input').forEach(i => i.value = '');
+            updateCalculations();
+        }
+
+        // Event Listeners
+        [...inputs, 'inputCategory'].forEach(id => {
+            document.getElementById(id).addEventListener('input', updateCalculations);
+        });
+        document.querySelectorAll('.month-input').forEach(i => i.addEventListener('input', updateCalculations));
+
+        handleMonthChange();
+        updateLabels();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Board Eligibility Check Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
