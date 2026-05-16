@@ -189,6 +189,620 @@
         .pdf-box { border: 2px solid black; }
         .pdf-row { display: flex; border-bottom: 1px solid black; }
         .pdf-header { background: #e5e7eb; text-align: center; font-weight: bold; padding: 4px; text-transform: uppercase; border-bottom: 2px solid black; }
+        .pdf-status-bar { height: 36px; border-bottom: 2px solid black; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
+        .pdf-label { width: 120px; font-weight: bold; padding: 6px 10px; border-right: 1px solid black; font-size: 14px; }
+        .pdf-value { flex: 1; padding: 6px 10px; font-size: 14px; }
+        .pdf-grid-3 { display: flex; text-align: center; }
+        .pdf-grid-col { flex: 1; border-right: 1px solid black; }
+        .pdf-grid-col:last-child { border-right: none; }
+        .pdf-grid-label { font-weight: bold; padding: 8px; border-bottom: 1px solid black; min-height: 40px; display: flex; align-items: center; justify-content: center; }
+        .pdf-grid-sub { font-size: 11px; font-weight: bold; padding: 4px; border-bottom: 1px solid black; }
+        .pdf-grid-value { font-weight: bold; padding: 10px; background: #ffff00; font-size: 18px; }
+    </style>
+</head>
+<body class="p-0 m-0">
+
+    <div class="header-banner flex justify-between items-center">
+        <div class="flex items-center space-x-6">
+            <img src="Goldmedal_Electricals_Logo.svg.png" alt="Goldmedal Logo" class="header-logo" onerror="this.src='https://placehold.co/120x40?text=Goldmedal'">
+            <h1 class="text-2xl font-700 tracking-tight">Board Eligibility Console</h1>
+        </div>
+        <div class="text-sm font-normal opacity-80">v4.7 Professional Mode</div>
+    </div>
+
+    <div class="flex p-8 items-start">
+        <!-- Sidebar -->
+        <div class="sidebar-container space-y-6">
+            <div class="glass-panel">
+                <table class="w-full">
+                    <tr>
+                        <th style="width: 100px;">Target</th>
+                        <td class="flex items-center space-x-2">
+                            <input type="number" id="inputPoints" placeholder="Points" value="3000" class="text-blue-600 focusable">
+                            <span class="text-gray-400 font-bold text-xs">Pts</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="glass-panel">
+                <table class="w-full">
+                    <tr>
+                        <th style="width: 100px;">Mobile</th>
+                        <td><input type="text" id="inputMobile" placeholder="Enter Mobile No." class="focusable"></td>
+                    </tr>
+                    <tr>
+                        <th>Category</th>
+                        <td>
+                            <select id="inputCategory" onchange="updateCategoryLabels()" class="cursor-pointer focusable">
+                                <option value="">Select Category</option>
+                                <option value="Retailer">Retailer</option>
+                                <option value="Dealer">Dealer</option>
+                                <option value="Distributor">Distributor</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr><th>Shop name</th><td><input type="text" id="inputShop" placeholder="Shop Name" class="focusable"></td></tr>
+                    <tr><th>City</th><td><input type="text" id="inputCity" placeholder="City" class="focusable"></td></tr>
+                    <tr><th>District</th><td><input type="text" id="inputDistrict" placeholder="District" class="focusable"></td></tr>
+                </table>
+            </div>
+
+            <div class="glass-panel">
+                <div class="px-3 py-2 bg-slate-100 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">New Points Data</div>
+                <table class="w-full">
+                    <tr class="bg-amber-50/50">
+                        <th style="width: 100px;">RRP (OLD)</th>
+                        <td><input type="number" id="inputRRP" placeholder="0" class="focusable"></td>
+                    </tr>
+                    <tr>
+                        <th id="catLabel1">GSD</th>
+                        <td><input type="text" id="perfInput1" placeholder="0" class="focusable"></td>
+                    </tr>
+                    <tr>
+                        <th id="catLabel2">RRP-GSD</th>
+                        <td><input type="text" id="perfInput2" placeholder="0" class="focusable"></td>
+                    </tr>
+                    <tr class="bg-blue-50/30">
+                        <th>
+                            <select id="selectMainMonth" onchange="handleMonthChange()" class="bg-transparent p-0 h-auto cursor-pointer focusable">
+                                <option value="Jan" selected>Jan</option>
+                                <option value="Feb">Feb</option>
+                                <option value="Mar">Mar</option>
+                                <option value="Apr">Apr</option>
+                                <option value="May">May</option>
+                                <option value="Jun">Jun</option>
+                                <option value="Jul">Jul</option>
+                                <option value="Aug">Aug</option>
+                                <option value="Sep">Sep</option>
+                                <option value="Oct">Oct</option>
+                                <option value="Nov">Nov</option>
+                                <option value="Dec">Dec</option>
+                            </select>
+                        </th>
+                        <td>
+                            <div class="smart-cell-container">
+                                <input type="text" class="month-input focusable" id="valMonth1" placeholder="0">
+                                <div class="sum-indicator">0</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr><th id="labelMonth2">Nov</th><td><div class="smart-cell-container"><input type="text" class="month-input focusable" id="valMonth2" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
+                    <tr><th id="labelMonth3">Oct</th><td><div class="smart-cell-container"><input type="text" class="month-input focusable" id="valMonth3" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
+                    <tr><th id="labelMonth4">Sep</th><td><div class="smart-cell-container"><input type="text" class="month-input focusable" id="valMonth4" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
+                </table>
+                <div class="p-2 bg-slate-50 border-t border-slate-200">
+                    <button onclick="clearCurrentForm()" class="w-full py-2 text-[11px] font-bold text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-all uppercase tracking-wider flex items-center justify-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                        <span>Clear Current Form</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-list-container space-y-6">
+            <!-- Active Preview -->
+            <div class="glass-panel border-blue-200 bg-blue-50/20">
+                 <div class="px-4 py-2 bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest">Entry Preview</div>
+                 <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Shop / Mobile</th>
+                            <th style="width: 15%;">RRP (OLD)</th>
+                            <th style="width: 15%;">3 Mnth Sum</th>
+                            <th style="width: 15%;">Total Points</th>
+                            <th class="text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="h-16">
+                            <td id="previewMobile" class="text-[11px] font-semibold">-</td>
+                            <td id="previewRRPDisplay" class="text-[11px]">0</td>
+                            <td id="preview3Months" class="text-[11px]">0</td>
+                            <td id="previewGSDTotal" class="text-[11px]">0</td>
+                            <td id="previewStatus" class="text-center px-4"></td>
+                        </tr>
+                    </tbody>
+                 </table>
+            </div>
+
+            <!-- List -->
+            <div class="glass-panel">
+                <div class="px-4 py-3 bg-white border-b border-slate-200 flex justify-between items-center">
+                    <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Entry List</h2>
+                </div>
+                <div class="max-h-[500px] overflow-y-auto">
+                    <table class="w-full" id="mainRecordsTable">
+                        <thead class="sticky top-0 z-20">
+                            <tr>
+                                <th>Shop Name</th>
+                                <th>Mobile</th>
+                                <th>City / District</th>
+                                <th>RRP(OLD)</th>
+                                <th>3 Mnth Sum</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col space-y-3 ml-4 sticky top-10">
+            <button class="btn-action btn-add flex items-center justify-center space-x-2" onclick="addRow()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                <span>Add Record</span>
+            </button>
+            <button class="btn-action flex items-center justify-center space-x-2" onclick="copyTableData()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                <span>Copy List</span>
+            </button>
+            <button class="btn-action flex items-center justify-center bg-slate-800 text-white space-x-2" onclick="printReport()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                <span>Print</span>
+            </button>
+            <button class="btn-action flex items-center justify-center space-x-2 text-red-600 border-red-200" onclick="clearAll()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                <span>Clear All Records</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- PDF Template -->
+    <div id="pdfTemplate">
+        <div class="pdf-box">
+            <div class="pdf-header">STATUS</div>
+            <!-- This is the red bar cell updated to show the text inside -->
+            <div class="pdf-status-bar" id="pdfStatusColor"></div>
+            <div class="pdf-row"><div class="pdf-label">Mobile No</div><div class="pdf-value" id="pdfMobile"></div></div>
+            <div class="pdf-row"><div class="pdf-label">Category</div><div class="pdf-value" id="pdfCategory"></div></div>
+            <div class="pdf-row"><div class="pdf-label">Shop name</div><div class="pdf-value" id="pdfShop"></div></div>
+            <div class="pdf-row"><div class="pdf-label">City</div><div class="pdf-value" id="pdfCity"></div></div>
+            <div class="pdf-row"><div class="pdf-label">District</div><div class="pdf-value" id="pdfDistrict"></div></div>
+            <div class="pdf-grid-3">
+                <div class="pdf-grid-col">
+                    <div class="pdf-grid-label">RRP(OLD)</div>
+                    <div class="pdf-grid-sub">TOTAL</div>
+                    <div class="pdf-grid-value" id="pdfRRP">0</div>
+                </div>
+                <div class="pdf-grid-col">
+                    <div class="pdf-grid-label" id="pdfGSDLabel">GSD</div>
+                    <div class="pdf-grid-sub">ACTUAL POINTS</div>
+                    <div class="pdf-grid-value" id="pdfGSD">0</div>
+                </div>
+                <div class="pdf-grid-col">
+                    <div class="pdf-grid-label">3MONTHS</div>
+                    <div class="pdf-grid-sub">TOTAL</div>
+                    <div class="pdf-grid-value" id="pdf3Months">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const inputMobile = document.getElementById('inputMobile');
+        const inputShop = document.getElementById('inputShop');
+        const inputCity = document.getElementById('inputCity');
+        const inputDistrict = document.getElementById('inputDistrict');
+        const inputRRP = document.getElementById('inputRRP');
+        const inputCategory = document.getElementById('inputCategory');
+        const inputPoints = document.getElementById('inputPoints');
+        const selectMainMonth = document.getElementById('selectMainMonth');
+        const monthInputs = document.querySelectorAll('.month-input');
+        const perfInput1 = document.getElementById('perfInput1');
+        const perfInput2 = document.getElementById('perfInput2');
+        const recordsBody = document.getElementById('recordsBody');
+
+        const monthsOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        function calculateExpression(text) {
+            if (!text || !text.trim()) return 0;
+            try {
+                const sanitized = String(text).replace(/[^0-9+\-*/().\s]/g, '');
+                const result = new Function(`return ${sanitized || '0'}`)();
+                return isFinite(result) ? parseFloat(result.toFixed(2)) : 0;
+            } catch (e) { return 0; }
+        }
+
+        function handleMonthChange() {
+            const index = monthsOrder.indexOf(selectMainMonth.value);
+            const getPrev = (idx, offset) => {
+                let target = idx - offset;
+                while (target < 0) target += 12;
+                return monthsOrder[target];
+            };
+            document.getElementById('labelMonth2').innerText = getPrev(index, 1);
+            document.getElementById('labelMonth3').innerText = getPrev(index, 2);
+            document.getElementById('labelMonth4').innerText = getPrev(index, 3);
+            updateCalculations();
+        }
+
+        function updateCategoryLabels() {
+            const cat = inputCategory.value;
+            const l1 = document.getElementById('catLabel1'), l2 = document.getElementById('catLabel2');
+            if (cat === "Distributor") { l1.innerText = "GDP"; l2.innerText = "RRP-GDP"; perfInput2.disabled = false; }
+            else if (cat === "Dealer") { l1.innerText = "GRP"; l2.innerText = ""; perfInput2.disabled = true; perfInput2.value = ""; }
+            else { l1.innerText = "GSD"; l2.innerText = "RRP-GSD"; perfInput2.disabled = false; }
+            updateCalculations();
+        }
+
+        function updateCalculations() {
+            const mobile = inputMobile.value;
+            const shop = inputShop.value;
+            const rrp = parseFloat(inputRRP.value) || 0;
+            const target = parseFloat(inputPoints.value) || 0;
+            const p1 = calculateExpression(perfInput1.value);
+            const p2 = calculateExpression(perfInput2.value);
+            
+            const totalPerf = p1 - p2;
+            let sum3M = 0; 
+            monthInputs.forEach(i => sum3M += calculateExpression(i.value));
+            
+            const finalThreeMonthSum = totalPerf - sum3M;
+
+            let status = "NOT ELIGIBLE";
+            if (rrp > target && p1 > target) status = "ELIGIBLE (RRP & " + document.getElementById('catLabel1').innerText + ")";
+            else if (rrp > target) status = "ELIGIBLE (BY RRP)";
+            else if (p1 > target) status = "ELIGIBLE (BY " + document.getElementById('catLabel1').innerText + ")";
+            else if (finalThreeMonthSum >= target) status = "ELIGIBLE (3 MONTHS)";
+
+            document.getElementById('previewMobile').innerText = mobile ? `${shop || 'Shop'} (${mobile})` : "-";
+            document.getElementById('previewRRPDisplay').innerText = mobile ? rrp.toLocaleString() : "0";
+            document.getElementById('previewGSDTotal').innerText = mobile ? p1.toLocaleString() : "0";
+            document.getElementById('preview3Months').innerText = mobile ? finalThreeMonthSum.toLocaleString() : "0";
+            
+            const ps = document.getElementById('previewStatus');
+            ps.innerText = status;
+            ps.className = "text-center px-4 " + (status.includes("ELIGIBLE") ? "status-eligible" : "status-not-eligible");
+        }
+
+        function clearCurrentForm() {
+            inputMobile.value = "";
+            inputShop.value = "";
+            inputCity.value = "";
+            inputDistrict.value = "";
+            inputRRP.value = "";
+            perfInput1.value = "";
+            perfInput2.value = "";
+            monthInputs.forEach(i => {
+                i.value = "";
+                i.closest('.smart-cell-container').classList.remove('has-sum');
+                i.closest('.smart-cell-container').querySelector('.sum-indicator').innerText = "0";
+            });
+            updateCalculations();
+            inputMobile.focus();
+        }
+
+        function addRow() {
+            if (!inputMobile.value) return;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${inputShop.value || '-'}</td>
+                <td>${inputMobile.value}</td>
+                <td class="text-xs">${inputCity.value || '-'} / ${inputDistrict.value || '-'}</td>
+                <td>${document.getElementById('previewRRPDisplay').innerText}</td>
+                <td>${document.getElementById('preview3Months').innerText}</td>
+                <td>${document.getElementById('previewGSDTotal').innerText}</td>
+                <td class="p-2"><div class="${document.getElementById('previewStatus').className}">${document.getElementById('previewStatus').innerText}</div></td>
+            `;
+            recordsBody.insertBefore(tr, recordsBody.firstChild);
+            clearCurrentForm();
+        }
+
+        function clearAll() {
+            recordsBody.innerHTML = '';
+            initEmptyRows();
+            updateCalculations();
+        }
+
+        function copyTableData() {
+            let csv = "Shop Name,Mobile,City/District,RRP(OLD),3 Mnth Sum,Total,Status\n";
+            const rows = document.querySelectorAll('#recordsBody tr:not(.opacity-20)');
+            rows.forEach(row => {
+                const cols = row.querySelectorAll('td');
+                if (cols.length > 0) {
+                    const rowData = Array.from(cols).map(c => c.innerText.replace(/,/g, '')).join(',');
+                    csv += rowData + "\n";
+                }
+            });
+            const el = document.createElement('textarea');
+            el.value = csv;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+        }
+
+        function printReport() {
+            if (!inputMobile.value) return;
+            const status = document.getElementById('previewStatus').innerText;
+            const isEligible = status.includes("ELIGIBLE");
+            
+            document.getElementById('pdfMobile').innerText = inputMobile.value;
+            document.getElementById('pdfCategory').innerText = inputCategory.value || "-";
+            document.getElementById('pdfShop').innerText = inputShop.value || "-";
+            document.getElementById('pdfCity').innerText = inputCity.value || "-";
+            document.getElementById('pdfDistrict').innerText = inputDistrict.value || "-";
+            document.getElementById('pdfRRP').innerText = inputRRP.value || "0";
+            document.getElementById('pdfGSD').innerText = calculateExpression(perfInput1.value) || "0";
+            document.getElementById('pdf3Months').innerText = document.getElementById('preview3Months').innerText;
+            document.getElementById('pdfGSDLabel').innerText = document.getElementById('catLabel1').innerText;
+            
+            // Set the Status Bar text and color
+            const pdfStatusCell = document.getElementById('pdfStatusColor');
+            pdfStatusCell.innerText = status;
+            pdfStatusCell.style.backgroundColor = isEligible ? "#ff0000" : "#ffffff";
+            pdfStatusCell.style.color = isEligible ? "#ffffff" : "#000000"; // Black text if white background
+
+            const element = document.getElementById('pdfTemplate');
+            element.style.display = 'block';
+            html2pdf().set({ 
+                margin: 0.5, 
+                filename: `Report_${inputMobile.value}.pdf`, 
+                html2canvas: { scale: 2 }, 
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } 
+            }).from(element).save().then(() => { 
+                element.style.display = 'none'; 
+            });
+        }
+
+        function initEmptyRows() { for(let i=0; i<15; i++) { const tr = document.createElement('tr'); tr.className = "opacity-20 h-10"; tr.innerHTML = '<td></td><td></td><td></td><td></td><td></td><td></td><td></td>'; recordsBody.appendChild(tr); } }
+
+        function setupNavigation() {
+            const focusables = Array.from(document.querySelectorAll('.focusable'));
+            focusables.forEach((el, index) => {
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        if (el.id === 'valMonth4') {
+                            addRow();
+                        } else {
+                            const next = focusables[index + 1];
+                            if (next) {
+                                if (next.disabled) {
+                                     const afterNext = focusables[index + 2];
+                                     if (afterNext) afterNext.focus();
+                                } else {
+                                     next.focus();
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        [inputMobile, inputShop, inputCity, inputDistrict, inputRRP, inputPoints, perfInput1, perfInput2].forEach(el => el.addEventListener('input', updateCalculations));
+        monthInputs.forEach(input => input.addEventListener('input', (e) => {
+            const container = e.target.closest('.smart-cell-container');
+            const sum = calculateExpression(e.target.value);
+            container.querySelector('.sum-indicator').innerText = sum;
+            if (e.target.value.includes('+')) container.classList.add('has-sum');
+            else container.classList.remove('has-sum');
+            updateCalculations();
+        }));
+
+        initEmptyRows();
+        handleMonthChange();
+        updateCategoryLabels();
+        setupNavigation();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Board Eligibility Check Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --bg-gray: #f8fafc;
+            --border-color: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-gray);
+            color: #1e293b;
+            overflow-x: hidden;
+            user-select: text;
+        }
+
+        .header-banner {
+            background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
+            color: white;
+            padding: 0.75rem 2.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .header-logo {
+            height: 50px;
+            width: auto;
+            object-fit: contain;
+            background: white;
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+
+        .glass-panel {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            overflow: hidden;
+        }
+
+        table {
+            border-collapse: separate;
+            border-spacing: 0;
+            width: 100%;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            user-select: none;
+        }
+
+        .sidebar-container th {
+            font-weight: 700 !important;
+            color: #1e293b;
+        }
+
+        td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            background: white;
+            transition: background 0.05s;
+            color: #1e293b;
+            position: relative;
+            cursor: cell;
+        }
+
+        td:last-child, th:last-child { border-right: none; }
+
+        input, select {
+            width: 100%;
+            border: 1px solid transparent;
+            outline: none;
+            background: transparent;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: 400 !important;
+        }
+
+        #selectMainMonth {
+            font-weight: 700 !important;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #1e293b;
+        }
+
+        input:focus, select:focus {
+            background: #f0f9ff;
+            border-color: #bae6fd;
+        }
+
+        .smart-cell-container {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            position: relative;
+        }
+
+        .sum-indicator {
+            font-size: 11px;
+            font-weight: 700;
+            color: #2563eb;
+            background: #eff6ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            white-space: nowrap;
+            min-width: 35px;
+            text-align: center;
+            border: 1px solid #dbeafe;
+            display: none;
+        }
+
+        .smart-cell-container.has-sum .sum-indicator { display: block; }
+
+        .btn-action {
+            background-color: white;
+            color: #1e293b;
+            border: 1px solid var(--border-color);
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .btn-action:hover {
+            background-color: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        .btn-add { background-color: #2563eb; color: white; border: none; }
+        .btn-add:hover { background-color: #1d4ed8; }
+
+        .status-eligible {
+            color: #059669;
+            background-color: #ecfdf5;
+            font-weight: 700;
+            text-align: center;
+            border-radius: 4px;
+            padding: 4px;
+            font-size: 0.7rem;
+        }
+
+        .status-not-eligible {
+            color: #dc2626;
+            background-color: #fef2f2;
+            font-weight: 700;
+            text-align: center;
+            border-radius: 4px;
+            padding: 4px;
+            font-size: 0.7rem;
+        }
+
+        .sidebar-container { width: 340px; }
+        .main-list-container { flex-grow: 1; margin-left: 40px; margin-right: 20px; }
+
+        /* Hidden PDF layout styles */
+        #pdfTemplate {
+            display: none;
+            width: 500px;
+            padding: 20px;
+            background: white;
+            font-family: 'Inter', sans-serif;
+        }
+        .pdf-box { border: 2px solid black; }
+        .pdf-row { display: flex; border-bottom: 1px solid black; }
+        .pdf-header { background: #e5e7eb; text-align: center; font-weight: bold; padding: 4px; text-transform: uppercase; border-bottom: 2px solid black; }
         .pdf-status-bar { height: 30px; border-bottom: 2px solid black; }
         .pdf-label { width: 120px; font-weight: bold; padding: 6px 10px; border-right: 1px solid black; font-size: 14px; }
         .pdf-value { flex: 1; padding: 6px 10px; font-size: 14px; }
