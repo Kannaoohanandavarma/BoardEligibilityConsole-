@@ -74,8 +74,20 @@
             transition: background 0.05s;
             color: #1e293b;
             position: relative;
+            cursor: cell;
         }
 
+        /* --- Excel-Style Rectangular Selection --- */
+        .selected-cell {
+            background-color: #dbeafe !important;
+            box-shadow: inset 0 0 0 1px #3b82f6;
+        }
+        
+        .dragging {
+            user-select: none;
+        }
+
+        tr:hover td { background-color: #f8fafc; }
         td:last-child, th:last-child { border-right: none; }
 
         input, select {
@@ -160,12 +172,16 @@
             font-size: 0.7rem;
         }
 
+        /* PDF Styles - Hidden but formatted for capture */
         #pdfTemplate {
-            display: none;
+            position: fixed;
+            left: -9999px;
+            top: 0;
             width: 500px;
             padding: 20px;
             background: white;
             font-family: 'Inter', sans-serif;
+            display: block;
         }
         .pdf-box { border: 2px solid black; }
         .pdf-row { display: flex; border-bottom: 1px solid black; }
@@ -176,12 +192,11 @@
         .pdf-grid-3 { display: flex; text-align: center; }
         .pdf-grid-col { flex: 1; border-right: 1px solid black; }
         .pdf-grid-col:last-child { border-right: none; }
-        .pdf-grid-label { font-weight: bold; padding: 8px; border-bottom: 1px solid black; min-height: 40px; display: flex; align-items: center; justify-content: center; }
-        .pdf-grid-sub { font-size: 11px; font-weight: bold; padding: 4px; border-bottom: 1px solid black; }
+        .pdf-grid-label { font-weight: bold; padding: 8px; border-bottom: 1px solid black; min-height: 40px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
         .pdf-grid-value { font-weight: bold; padding: 10px; background: #ffff00; font-size: 18px; }
     </style>
 </head>
-<body>
+<body onmouseup="stopDragging()">
 
     <div class="header-banner flex justify-between items-center">
         <div class="flex items-center space-x-6">
@@ -189,8 +204,8 @@
             <h1 class="text-2xl font-bold tracking-tight">Board Eligibility Console</h1>
         </div>
         <div class="text-right">
-            <div class="text-[9px] bg-white/20 px-2 py-0.5 rounded text-white font-bold uppercase tracking-widest">Independent Work Mode</div>
-            <div class="text-[10px] text-white/70 italic">Local Browser Cache Enabled</div>
+            <div class="text-[9px] bg-white/20 px-2 py-0.5 rounded text-white font-bold uppercase tracking-widest">Standalone Mode</div>
+            <div class="text-[10px] text-white/70 italic">Multi-Select & Copy Support</div>
         </div>
     </div>
 
@@ -295,11 +310,14 @@
             <!-- Table of History -->
             <div class="glass-panel">
                 <div class="px-4 py-3 bg-white border-b border-slate-200 flex justify-between items-center">
-                    <h2 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Entry History (This Browser Only)</h2>
+                    <div class="flex items-center space-x-3">
+                        <h2 class="text-xs font-bold text-slate-500 uppercase tracking-widest">Entry History</h2>
+                        <span class="text-[10px] text-blue-500 font-medium">(Ctrl+C to Copy Selection)</span>
+                    </div>
                     <button onclick="clearHistory()" class="text-[10px] font-bold text-red-500 hover:underline uppercase">Clear List</button>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full">
+                    <table class="w-full" id="historyTable" onmousedown="startDragging(event)">
                         <thead>
                             <tr>
                                 <th>Shop Name</th>
@@ -320,7 +338,7 @@
         </div>
     </div>
 
-    <!-- Hidden PDF Export -->
+    <!-- Hidden PDF Export Template -->
     <div id="pdfTemplate">
         <div class="pdf-box">
             <div class="pdf-header">Board Eligibility Status</div>
@@ -338,7 +356,7 @@
                     <div id="pdfValActual" class="pdf-grid-value">0</div>
                 </div>
                 <div class="pdf-grid-col">
-                    <div class="pdf-grid-label">3M FINAL</div>
+                    <div id="pdfValFinalHeader" class="pdf-grid-label">3M FINAL</div>
                     <div id="pdfValFinal" class="pdf-grid-value">0</div>
                 </div>
             </div>
@@ -348,6 +366,8 @@
     <script>
         const monthsOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         let localData = [];
+        let isDragging = false;
+        let startCell = { r: -1, c: -1 };
 
         // Elements
         const mobileEl = document.getElementById('inputMobile');
@@ -362,10 +382,99 @@
         const p2El = document.getElementById('perfInput2');
         const monthInputs = document.querySelectorAll('.month-input');
         const historyBody = document.getElementById('historyBody');
+        const historyTable = document.getElementById('historyTable');
+
+        // --- EXCEL-STYLE SELECTION & COPY LOGIC ---
+        
+        function startDragging(e) {
+            const td = e.target.closest('td');
+            if (!td || e.target.tagName === 'BUTTON') return;
+            
+            isDragging = true;
+            document.body.classList.add('dragging');
+            const tr = td.parentElement;
+            startCell = { r: tr.rowIndex, c: td.cellIndex };
+            
+            clearSelection();
+            updateSelection(startCell.r, startCell.c);
+        }
+
+        function stopDragging() {
+            isDragging = false;
+            document.body.classList.remove('dragging');
+        }
+
+        historyTable.onmouseover = (e) => {
+            if (!isDragging) return;
+            const td = e.target.closest('td');
+            if (!td) return;
+            updateSelection(td.parentElement.rowIndex, td.cellIndex);
+        };
+
+        function updateSelection(currR, currC) {
+            clearSelection();
+            const minR = Math.min(startCell.r, currR);
+            const maxR = Math.max(startCell.r, currR);
+            const minC = Math.min(startCell.c, currC);
+            const maxC = Math.max(startCell.c, currC);
+            
+            const rows = historyTable.rows;
+            for (let i = minR; i <= maxR; i++) {
+                const row = rows[i];
+                if (!row || row.parentElement.tagName === 'THEAD') continue;
+                for (let j = minC; j <= maxC; j++) {
+                    const cell = row.cells[j];
+                    if (cell) cell.classList.add('selected-cell');
+                }
+            }
+        }
+
+        function clearSelection() {
+            document.querySelectorAll('.selected-cell').forEach(el => el.classList.remove('selected-cell'));
+        }
+
+        // CTRL+C Handling
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+                const selected = document.querySelectorAll('.selected-cell');
+                if (selected.length === 0) return;
+
+                // Identify grid bounds of selection
+                let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
+                selected.forEach(td => {
+                    const r = td.parentElement.rowIndex;
+                    const c = td.cellIndex;
+                    minR = Math.min(minR, r); maxR = Math.max(maxR, r);
+                    minC = Math.min(minC, c); maxC = Math.max(maxC, c);
+                });
+
+                let copyText = "";
+                for (let r = minR; r <= maxR; r++) {
+                    let rowData = [];
+                    for (let c = minC; c <= maxC; c++) {
+                        const cell = historyTable.rows[r].cells[c];
+                        rowData.push(cell.innerText.trim());
+                    }
+                    copyText += rowData.join("\t") + "\n";
+                }
+
+                const textarea = document.createElement("textarea");
+                textarea.value = copyText;
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                } catch (err) {}
+                document.body.removeChild(textarea);
+            }
+        });
+
+        // --- Core Application Logic ---
 
         function parse(val) {
             if (!val || !val.toString().trim()) return 0;
             try {
+                // Safety: only allow math chars
                 return new Function(`return ${val.toString().replace(/[^0-9+\-*/().\s]/g, '') || '0'}`)() || 0;
             } catch { return 0; }
         }
@@ -381,12 +490,16 @@
             monthInputs.forEach(i => monthSum += parse(i.value));
             const final3M = actualTotal - monthSum;
 
-            let status = "NOT ELIGIBLE";
-            if (rrp >= target) status = "ELIGIBLE (RRP)";
-            else if (p1 >= target) status = "ELIGIBLE (" + document.getElementById('catLabel1').innerText + ")";
-            else if (final3M >= target) status = "ELIGIBLE (3M)";
+            // COMBINED ELIGIBILITY LOGIC
+            let eligibilityReasons = [];
+            if (rrp >= target) eligibilityReasons.push("RRP");
+            if (p1 >= target) eligibilityReasons.push(document.getElementById('catLabel1').innerText);
+            if (final3M >= target) eligibilityReasons.push("3M");
 
-            // Update Preview
+            let status = eligibilityReasons.length > 0 
+                ? "ELIGIBLE (" + eligibilityReasons.join(" & ") + ")" 
+                : "NOT ELIGIBLE";
+
             document.getElementById('prevShop').innerText = mobileEl.value ? `${shopEl.value || 'Shop'} (${mobileEl.value})` : "-";
             document.getElementById('prevRRP').innerText = rrp.toLocaleString();
             document.getElementById('prevActual').innerText = actualTotal.toLocaleString();
@@ -440,7 +553,7 @@
                     <td class="text-sm font-bold text-blue-700">${item.final.toLocaleString()}</td>
                     <td><div class="${item.status.includes('ELIGIBLE') ? 'status-eligible' : 'status-not-eligible'}">${item.status}</div></td>
                     <td class="text-center">
-                        <button onclick="removeRecord(${item.id})" class="text-red-300 hover:text-red-500">×</button>
+                        <button onclick="removeRecord(${item.id})" class="text-red-300 hover:text-red-500 font-bold p-1">×</button>
                     </td>
                 `;
                 historyBody.appendChild(tr);
@@ -488,6 +601,8 @@
         function printReport() {
             if (!mobileEl.value) return;
             const res = updateCalculations();
+            
+            // Sync PDF Data
             document.getElementById('pdfMobile').innerText = mobileEl.value;
             document.getElementById('pdfShop').innerText = shopEl.value || "-";
             document.getElementById('pdfLocation').innerText = `${cityEl.value}, ${distEl.value}`;
@@ -501,11 +616,19 @@
             bar.style.backgroundColor = res.status.includes("ELIGIBLE") ? "#059669" : "#dc2626";
 
             const element = document.getElementById('pdfTemplate');
-            element.style.display = 'block';
-            html2pdf().from(element).set({ filename: `Status_${mobileEl.value}.pdf` }).save().then(() => element.style.display='none');
+            const opt = {
+                margin: 0.2,
+                filename: `Eligibility_${mobileEl.value}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            // Capture the element
+            html2pdf().set(opt).from(element).save();
         }
 
-        // Event Listeners
+        // Listeners
         [mobileEl, shopEl, cityEl, distEl, rrpEl, targetEl, p1El, p2El].forEach(el => el.addEventListener('input', updateCalculations));
         monthInputs.forEach(input => input.addEventListener('input', (e) => {
             const container = e.target.closest('.smart-cell-container');
@@ -515,7 +638,6 @@
             updateCalculations();
         }));
 
-        // Enter key navigation
         document.querySelectorAll('.focusable').forEach((el, i, arr) => {
             el.addEventListener('keydown', e => {
                 if (e.key === 'Enter') {
@@ -526,7 +648,6 @@
             });
         });
 
-        // Initialize
         renderHistory();
         updateCategoryLabels();
         handleMonthChange();
