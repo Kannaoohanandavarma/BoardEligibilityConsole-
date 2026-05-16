@@ -95,14 +95,6 @@
             font-size: 13px;
         }
 
-        #selectMainMonth {
-            font-weight: 700 !important;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #1e293b;
-        }
-
         input:focus, select:focus {
             background: #f0f9ff;
             border-color: #bae6fd;
@@ -177,7 +169,6 @@
         .sidebar-container { width: 340px; flex-shrink: 0; }
         .main-list-container { flex-grow: 1; margin-left: 30px; }
 
-        /* Hidden PDF layout styles */
         #pdfTemplate {
             display: none;
             width: 500px;
@@ -199,20 +190,21 @@
         .pdf-grid-value { font-weight: bold; padding: 10px; background: #ffff00; font-size: 18px; }
     </style>
 </head>
-<body class="p-0 m-0">
+<body>
 
     <div class="header-banner flex justify-between items-center">
         <div class="flex items-center space-x-6">
             <img src="Goldmedal_Electricals_Logo.svg.png" alt="Goldmedal Logo" class="header-logo" onerror="this.src='https://placehold.co/120x40?text=Goldmedal'">
             <h1 class="text-2xl font-bold tracking-tight">Board Eligibility Console</h1>
         </div>
-        <div class="flex flex-col items-end">
-            <div id="syncStatus" class="text-[9px] bg-white/20 px-2 py-0.5 rounded text-white font-bold uppercase mb-1">Loading...</div>
-            <div id="userDisplay" class="text-[10px] text-white/70 italic">Checking ID...</div>
+        <div class="text-right">
+            <div class="text-[9px] bg-white/20 px-2 py-0.5 rounded text-white font-bold uppercase">Standalone Mode</div>
+            <div class="text-[10px] text-white/70 italic">Local PC Storage Only</div>
         </div>
     </div>
 
     <div class="flex p-8 items-start">
+        <!-- Input Sidebar -->
         <div class="sidebar-container space-y-6">
             <div class="glass-panel">
                 <table class="w-full">
@@ -285,8 +277,8 @@
                     <tr><th id="labelMonth4">Apr</th><td><div class="smart-cell-container"><input type="text" class="month-input focusable" id="valMonth4" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
                 </table>
                 <div class="p-2 bg-slate-50 border-t border-slate-200">
-                    <button onclick="clearCurrentForm()" class="w-full py-2 text-[11px] font-bold text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-all uppercase tracking-wider flex items-center justify-center space-x-2">
-                        <span>Clear Current Form</span>
+                    <button onclick="clearCurrentForm()" class="w-full py-2 text-[11px] font-bold text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-all uppercase tracking-wider">
+                        Clear Form
                     </button>
                 </div>
             </div>
@@ -297,9 +289,10 @@
             </div>
         </div>
 
+        <!-- Local History -->
         <div class="main-list-container space-y-6">
             <div class="glass-panel border-blue-200 bg-blue-50/20">
-                 <div class="px-4 py-2 bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest">Live Status Preview</div>
+                 <div class="px-4 py-2 bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest">Entry Preview</div>
                  <table class="w-full">
                     <thead>
                         <tr>
@@ -307,7 +300,7 @@
                             <th style="width: 15%;">RRP (OLD)</th>
                             <th style="width: 15%;">Actual Points</th>
                             <th style="width: 15%;">3 Month Final</th>
-                            <th class="text-center">Eligibility Status</th>
+                            <th class="text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -324,14 +317,14 @@
 
             <div class="glass-panel">
                 <div class="px-4 py-3 bg-white border-b border-slate-200 flex justify-between items-center">
-                    <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider">My Private Records</h2>
-                    <div class="flex space-x-2">
+                    <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Session History</h2>
+                    <div class="flex space-x-4">
                         <button onclick="copyTableData()" class="text-[10px] font-bold text-blue-600 hover:underline">COPY CSV</button>
-                        <button onclick="handleClearAll()" class="text-[10px] font-bold text-red-500 hover:underline">CLEAR ALL</button>
+                        <button onclick="clearAllRecords()" class="text-[10px] font-bold text-red-500 hover:underline">CLEAR LIST</button>
                     </div>
                 </div>
                 <div class="max-h-[600px] overflow-y-auto">
-                    <table class="w-full" id="mainRecordsTable">
+                    <table class="w-full">
                         <thead class="sticky top-0 z-20">
                             <tr>
                                 <th>Shop Name</th>
@@ -355,314 +348,168 @@
     <div id="pdfTemplate">
         <div class="pdf-box">
             <div class="pdf-header">Board Eligibility Status</div>
-            <div class="pdf-status-bar" id="pdfStatusColor"></div>
-            <div class="pdf-row"><div class="pdf-label">Mobile No</div><div class="pdf-value" id="pdfMobile"></div></div>
-            <div class="pdf-row"><div class="pdf-label">Category</div><div class="pdf-value" id="pdfCategory"></div></div>
-            <div class="pdf-row"><div class="pdf-label">Shop name</div><div class="pdf-value" id="pdfShop"></div></div>
-            <div class="pdf-row"><div class="pdf-label">City</div><div class="pdf-value" id="pdfCity"></div></div>
-            <div class="pdf-row"><div class="pdf-label">District</div><div class="pdf-value" id="pdfDistrict"></div></div>
+            <div id="pdfStatusColor" class="pdf-status-bar"></div>
+            <div class="pdf-row"><div class="pdf-label">Mobile No</div><div id="pdfMobile" class="pdf-value"></div></div>
+            <div class="pdf-row"><div class="pdf-label">Category</div><div id="pdfCategory" class="pdf-value"></div></div>
+            <div class="pdf-row"><div class="pdf-label">Shop name</div><div id="pdfShop" class="pdf-value"></div></div>
+            <div class="pdf-row"><div class="pdf-label">City</div><div id="pdfCity" class="pdf-value"></div></div>
+            <div class="pdf-row"><div class="pdf-label">District</div><div id="pdfDistrict" class="pdf-value"></div></div>
             <div class="pdf-grid-3">
                 <div class="pdf-grid-col">
                     <div class="pdf-grid-label">RRP(OLD)</div>
                     <div class="pdf-grid-sub">TOTAL</div>
-                    <div class="pdf-grid-value" id="pdfRRP">0</div>
+                    <div id="pdfRRP" class="pdf-grid-value">0</div>
                 </div>
                 <div class="pdf-grid-col">
-                    <div class="pdf-grid-label" id="pdfGSDLabel">GSD</div>
+                    <div id="pdfGSDLabel" class="pdf-grid-label">GSD</div>
                     <div class="pdf-grid-sub">ACTUAL POINTS</div>
-                    <div class="pdf-grid-value" id="pdfGSD">0</div>
+                    <div id="pdfGSD" class="pdf-grid-value">0</div>
                 </div>
                 <div class="pdf-grid-col">
                     <div class="pdf-grid-label">3MONTHS</div>
                     <div class="pdf-grid-sub">FINAL TOTAL</div>
-                    <div class="pdf-grid-value" id="pdf3Months">0</div>
+                    <div id="pdf3Months" class="pdf-grid-value">0</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, deleteDoc, doc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Firebase Setup
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'board-eligibility-v5';
-
-        // UI Variables
-        const inputMobile = document.getElementById('inputMobile');
-        const inputShop = document.getElementById('inputShop');
-        const inputCity = document.getElementById('inputCity');
-        const inputDistrict = document.getElementById('inputDistrict');
-        const inputRRP = document.getElementById('inputRRP');
-        const inputCategory = document.getElementById('inputCategory');
-        const inputPoints = document.getElementById('inputPoints');
-        const selectMainMonth = document.getElementById('selectMainMonth');
-        const monthInputs = document.querySelectorAll('.month-input');
-        const perfInput1 = document.getElementById('perfInput1');
-        const perfInput2 = document.getElementById('perfInput2');
+    <script>
+        // DOM Elements
+        const mobileIn = document.getElementById('inputMobile');
+        const shopIn = document.getElementById('inputShop');
+        const cityIn = document.getElementById('inputCity');
+        const districtIn = document.getElementById('inputDistrict');
+        const rrpIn = document.getElementById('inputRRP');
+        const catIn = document.getElementById('inputCategory');
+        const pointsIn = document.getElementById('inputPoints');
+        const monthSel = document.getElementById('selectMainMonth');
+        const monthIns = document.querySelectorAll('.month-input');
+        const perfIn1 = document.getElementById('perfInput1');
+        const perfIn2 = document.getElementById('perfInput2');
         const recordsBody = document.getElementById('recordsBody');
-        const syncStatus = document.getElementById('syncStatus');
-        const userDisplay = document.getElementById('userDisplay');
 
         const monthsOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        let localRecords = [];
 
-        let currentUser = null;
-
-        // Authentication & Real-time Listeners
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (err) {
-                console.error("Auth failed:", err);
-                syncStatus.innerText = "Offline";
-                syncStatus.className = "text-[9px] bg-red-500 px-2 py-0.5 rounded text-white font-bold uppercase mb-1";
-            }
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            currentUser = user;
-            if (user) {
-                syncStatus.innerText = "Ready";
-                syncStatus.className = "text-[9px] bg-green-500 px-2 py-0.5 rounded text-white font-bold uppercase mb-1";
-                userDisplay.innerText = `User ID: ${user.uid.substring(0, 8)}...`;
-                listenToPrivateRecords(user.uid);
-            }
-        });
-
-        const listenToPrivateRecords = (userId) => {
-            // RULE 1 & 3: Private path and guard
-            if (!userId) return;
-            const privateCol = collection(db, 'artifacts', appId, 'users', userId, 'records');
-            
-            onSnapshot(privateCol, (snapshot) => {
-                const records = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                renderRecords(records);
-            }, (err) => {
-                console.error("Sync error:", err);
-            });
-        };
-
-        const renderRecords = (records) => {
-            recordsBody.innerHTML = '';
-            if (records.length === 0) {
-                initEmptyRows();
-                return;
-            }
-            
-            // Sort in memory by timestamp descending
-            records.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
-            records.forEach(rec => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="font-medium">${rec.shop || '-'}</td>
-                    <td>${rec.mobile}</td>
-                    <td class="text-xs text-slate-500">${rec.city || '-'} / ${rec.district || '-'}</td>
-                    <td>${rec.rrp || 0}</td>
-                    <td>${rec.sum3m || 0}</td>
-                    <td>${rec.actual || 0}</td>
-                    <td class="p-2"><div class="${rec.status.includes('ELIGIBLE') ? 'status-eligible' : 'status-not-eligible'}">${rec.status}</div></td>
-                    <td class="text-center">
-                        <button class="delete-btn text-red-300 hover:text-red-500" data-id="${rec.id}">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                        </button>
-                    </td>
-                `;
-                recordsBody.appendChild(tr);
-            });
-
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.onclick = () => deleteRecord(btn.getAttribute('data-id'));
-            });
-        };
-
-        // Data Operations
-        const addRow = async () => {
-            if (!currentUser || !inputMobile.value) return;
-            
-            const record = {
-                shop: inputShop.value,
-                mobile: inputMobile.value,
-                city: inputCity.value,
-                district: inputDistrict.value,
-                rrp: inputRRP.value || 0,
-                sum3m: document.getElementById('preview3Months').innerText,
-                actual: document.getElementById('previewGSDTotal').innerText,
-                status: document.getElementById('previewStatus').innerText,
-                timestamp: Date.now()
-            };
-
-            try {
-                const privateCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'records');
-                await addDoc(privateCol, record);
-                clearCurrentForm();
-            } catch (err) {
-                console.error("Save error:", err);
-            }
-        };
-
-        const deleteRecord = async (id) => {
-            if (!currentUser) return;
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'records', id));
-            } catch (err) {
-                console.error("Delete error:", err);
-            }
-        };
-
-        const handleClearAll = async () => {
-            if (!currentUser) return;
-            try {
-                const privateCol = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'records');
-                const snapshot = await getDocs(privateCol);
-                const batch = writeBatch(db);
-                snapshot.docs.forEach(d => batch.delete(d.ref));
-                await batch.commit();
-            } catch (err) {
-                console.error("Clear error:", err);
-            }
-        };
-
-        // UI Logic Functions
-        function calculateExpression(text) {
+        // --- MATH ---
+        function calculateExpr(text) {
             if (!text || !text.trim()) return 0;
             try {
                 const sanitized = String(text).replace(/[^0-9+\-*/().\s]/g, '');
-                const result = new Function(`return ${sanitized || '0'}`)();
-                return isFinite(result) ? parseFloat(result.toFixed(2)) : 0;
+                return new Function(`return ${sanitized || '0'}`)() || 0;
             } catch (e) { return 0; }
         }
 
-        function handleMonthChange() {
-            const index = monthsOrder.indexOf(selectMainMonth.value);
-            const getPrev = (idx, offset) => {
-                let target = idx - offset;
-                while (target < 0) target += 12;
-                return monthsOrder[target];
-            };
-            document.getElementById('labelMonth2').innerText = getPrev(index, 1);
-            document.getElementById('labelMonth3').innerText = getPrev(index, 2);
-            document.getElementById('labelMonth4').innerText = getPrev(index, 3);
-            updateCalculations();
-        }
-
-        function updateCategoryLabels() {
-            const cat = inputCategory.value;
-            const l1 = document.getElementById('catLabel1'), l2 = document.getElementById('catLabel2');
-            if (cat === "Distributor") { l1.innerText = "GDP"; l2.innerText = "RRP-GDP"; perfInput2.disabled = false; }
-            else if (cat === "Dealer") { l1.innerText = "GRP"; l2.innerText = "N/A"; perfInput2.disabled = true; perfInput2.value = ""; }
-            else { l1.innerText = "GSD"; l2.innerText = "RRP-GSD"; perfInput2.disabled = false; }
-            updateCalculations();
-        }
-
         function updateCalculations() {
-            const mobile = inputMobile.value;
-            const shop = inputShop.value;
-            const rrp = parseFloat(inputRRP.value) || 0;
-            const target = parseFloat(inputPoints.value) || 0;
-            const p1 = calculateExpression(perfInput1.value);
-            const p2 = calculateExpression(perfInput2.value);
+            const rrp = parseFloat(rrpIn.value) || 0;
+            const target = parseFloat(pointsIn.value) || 0;
+            const p1 = calculateExpr(perfIn1.value);
+            const p2 = calculateExpr(perfIn2.value);
             
             const actualTotal = p1 - p2;
             let deduction = 0; 
-            monthInputs.forEach(i => deduction += calculateExpression(i.value));
-            
-            const finalThreeMonthSum = actualTotal - deduction;
+            monthIns.forEach(i => deduction += calculateExpr(i.value));
+            const final3M = actualTotal - deduction;
 
             let status = "NOT ELIGIBLE";
             if (rrp >= target) status = "ELIGIBLE (BY RRP)";
             else if (p1 >= target) status = "ELIGIBLE (BY " + document.getElementById('catLabel1').innerText + ")";
-            else if (finalThreeMonthSum >= target) status = "ELIGIBLE (3 MONTHS)";
+            else if (final3M >= target) status = "ELIGIBLE (3 MONTHS)";
 
-            document.getElementById('previewMobile').innerText = mobile ? `${shop || 'Shop'} (${mobile})` : "-";
+            document.getElementById('previewMobile').innerText = mobileIn.value ? `${shopIn.value || 'Shop'} (${mobileIn.value})` : "-";
             document.getElementById('previewRRPDisplay').innerText = rrp.toLocaleString();
             document.getElementById('previewGSDTotal').innerText = actualTotal.toLocaleString();
-            document.getElementById('preview3Months').innerText = finalThreeMonthSum.toLocaleString();
+            document.getElementById('preview3Months').innerText = final3M.toLocaleString();
             
             const ps = document.getElementById('previewStatus');
             ps.innerText = status;
             ps.className = "text-center px-4 " + (status.includes("ELIGIBLE") ? "status-eligible" : "status-not-eligible");
         }
 
+        // --- LOCAL STORAGE SIMULATION (RAM ONLY) ---
+        function addRow() {
+            if (!mobileIn.value) return;
+            const rec = {
+                id: Date.now(),
+                shop: shopIn.value,
+                mobile: mobileIn.value,
+                city: cityIn.value,
+                district: districtIn.value,
+                rrp: rrpIn.value || 0,
+                sum3m: document.getElementById('preview3Months').innerText,
+                actual: document.getElementById('previewGSDTotal').innerText,
+                status: document.getElementById('previewStatus').innerText
+            };
+            localRecords.unshift(rec);
+            renderTable();
+            clearCurrentForm();
+        }
+
+        function renderTable() {
+            recordsBody.innerHTML = '';
+            if (localRecords.length === 0) {
+                initEmptyRows();
+                return;
+            }
+            localRecords.forEach(rec => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="font-medium">${rec.shop || '-'}</td>
+                    <td>${rec.mobile}</td>
+                    <td class="text-[11px] text-slate-500">${rec.city || '-'}, ${rec.district || '-'}</td>
+                    <td>${rec.rrp || 0}</td>
+                    <td>${rec.sum3m || 0}</td>
+                    <td>${rec.actual || 0}</td>
+                    <td class="p-2"><div class="${rec.status.includes('ELIGIBLE') ? 'status-eligible' : 'status-not-eligible'}">${rec.status}</div></td>
+                    <td class="text-center">
+                        <button onclick="deleteLocal('${rec.id}')" class="text-red-300 hover:text-red-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                    </td>
+                `;
+                recordsBody.appendChild(tr);
+            });
+        }
+
+        function deleteLocal(id) {
+            localRecords = localRecords.filter(r => r.id != id);
+            renderTable();
+        }
+
+        function clearAllRecords() {
+            localRecords = [];
+            renderTable();
+        }
+
         function clearCurrentForm() {
-            [inputMobile, inputShop, inputCity, inputDistrict, inputRRP, perfInput1, perfInput2].forEach(i => i.value = "");
-            monthInputs.forEach(i => {
+            [mobileIn, shopIn, cityIn, districtIn, rrpIn, perfIn1, perfIn2].forEach(i => i.value = "");
+            monthIns.forEach(i => {
                 i.value = "";
                 i.closest('.smart-cell-container').classList.remove('has-sum');
                 i.closest('.smart-cell-container').querySelector('.sum-indicator').innerText = "0";
             });
             updateCalculations();
-            inputMobile.focus();
+            mobileIn.focus();
         }
 
-        function copyTableData() {
-            let csv = "Shop Name,Mobile,Location,RRP,3M Sum,Actual,Status\n";
-            const rows = Array.from(recordsBody.querySelectorAll('tr:not(.opacity-20)'));
-            rows.forEach(row => {
-                const cols = row.querySelectorAll('td');
-                if (cols.length > 0) {
-                    const rowData = Array.from(cols).slice(0, 7).map(c => c.innerText.replace(/,/g, '')).join(',');
-                    csv += rowData + "\n";
-                }
-            });
-            const el = document.createElement('textarea');
-            el.value = csv;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
+        // --- UTILS ---
+        function handleMonthChange() {
+            const idx = monthsOrder.indexOf(monthSel.value);
+            const getPrev = (i, off) => { let t = i - off; while(t < 0) t += 12; return monthsOrder[t]; };
+            document.getElementById('labelMonth2').innerText = getPrev(idx, 1);
+            document.getElementById('labelMonth3').innerText = getPrev(idx, 2);
+            document.getElementById('labelMonth4').innerText = getPrev(idx, 3);
+            updateCalculations();
         }
 
-        function printReport() {
-            if (!inputMobile.value) return;
-            const status = document.getElementById('previewStatus').innerText;
-            const isEligible = status.includes("ELIGIBLE");
-            
-            document.getElementById('pdfMobile').innerText = inputMobile.value;
-            document.getElementById('pdfCategory').innerText = inputCategory.value || "-";
-            document.getElementById('pdfShop').innerText = inputShop.value || "-";
-            document.getElementById('pdfCity').innerText = inputCity.value || "-";
-            document.getElementById('pdfDistrict').innerText = inputDistrict.value || "-";
-            document.getElementById('pdfRRP').innerText = inputRRP.value || "0";
-            document.getElementById('pdfGSD').innerText = document.getElementById('previewGSDTotal').innerText;
-            document.getElementById('pdf3Months').innerText = document.getElementById('preview3Months').innerText;
-            document.getElementById('pdfGSDLabel').innerText = document.getElementById('catLabel1').innerText;
-            
-            const pdfStatusCell = document.getElementById('pdfStatusColor');
-            pdfStatusCell.innerText = status;
-            pdfStatusCell.style.backgroundColor = isEligible ? "#059669" : "#dc2626";
-            pdfStatusCell.style.color = "#ffffff";
-
-            const element = document.getElementById('pdfTemplate');
-            element.style.display = 'block';
-            html2pdf().set({ 
-                margin: 0.5, 
-                filename: `Eligibility_Report_${inputMobile.value}.pdf`, 
-                html2canvas: { scale: 2 }, 
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } 
-            }).from(element).save().then(() => { 
-                element.style.display = 'none'; 
-            });
-        }
-
-        function initEmptyRows() { 
-            for(let i=0; i<10; i++) { 
-                const tr = document.createElement('tr'); 
-                tr.className = "opacity-20 h-10"; 
-                tr.innerHTML = '<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>'; 
-                recordsBody.appendChild(tr); 
-            } 
+        function updateCategoryLabels() {
+            const cat = catIn.value;
+            const l1 = document.getElementById('catLabel1'), l2 = document.getElementById('catLabel2');
+            if (cat === "Distributor") { l1.innerText = "GDP"; l2.innerText = "RRP-GDP"; perfIn2.disabled = false; }
+            else if (cat === "Dealer") { l1.innerText = "GRP"; l2.innerText = "N/A"; perfIn2.disabled = true; perfIn2.value = ""; }
+            else { l1.innerText = "GSD"; l2.innerText = "RRP-GSD"; perfIn2.disabled = false; }
+            updateCalculations();
         }
 
         function setupNavigation() {
@@ -672,46 +519,63 @@
                     if (e.key === 'Enter') {
                         e.preventDefault();
                         const next = focusables[index + 1];
-                        if (next) {
-                            if (next.disabled) {
-                                const afterNext = focusables[index + 2];
-                                if (afterNext) afterNext.focus();
-                            } else {
-                                next.focus();
-                            }
-                        } else {
-                            addRow();
-                        }
+                        if (next) next.focus();
+                        else addRow();
                     }
                 });
             });
         }
 
-        // Exposed functions
-        window.addRow = addRow;
-        window.handleClearAll = handleClearAll;
-        window.clearCurrentForm = clearCurrentForm;
-        window.copyTableData = copyTableData;
-        window.printReport = printReport;
-        window.handleMonthChange = handleMonthChange;
-        window.updateCategoryLabels = updateCategoryLabels;
+        function printReport() {
+            if (!mobileIn.value) return;
+            const status = document.getElementById('previewStatus').innerText;
+            document.getElementById('pdfMobile').innerText = mobileIn.value;
+            document.getElementById('pdfCategory').innerText = catIn.value || "-";
+            document.getElementById('pdfShop').innerText = shopIn.value || "-";
+            document.getElementById('pdfCity').innerText = cityIn.value || "-";
+            document.getElementById('pdfDistrict').innerText = districtIn.value || "-";
+            document.getElementById('pdfRRP').innerText = rrpIn.value || "0";
+            document.getElementById('pdfGSD').innerText = document.getElementById('previewGSDTotal').innerText;
+            document.getElementById('pdf3Months').innerText = document.getElementById('preview3Months').innerText;
+            document.getElementById('pdfGSDLabel').innerText = document.getElementById('catLabel1').innerText;
+            const pc = document.getElementById('pdfStatusColor');
+            pc.innerText = status;
+            pc.style.backgroundColor = status.includes("ELIGIBLE") ? "#059669" : "#dc2626";
+            const element = document.getElementById('pdfTemplate');
+            element.style.display = 'block';
+            html2pdf().set({ filename: `Report_${mobileIn.value}.pdf`, html2canvas: { scale: 2 } }).from(element).save().then(() => element.style.display = 'none');
+        }
+
+        function copyTableData() {
+            let csv = "Shop Name,Mobile,Location,RRP,3M Sum,Actual,Status\n";
+            localRecords.forEach(rec => {
+                csv += `${rec.shop},${rec.mobile},${rec.city}-${rec.district},${rec.rrp},${rec.sum3m},${rec.actual},${rec.status}\n`;
+            });
+            const t = document.createElement('textarea'); t.value = csv; document.body.appendChild(t); t.select(); document.execCommand('copy'); document.body.removeChild(t);
+        }
+
+        function initEmptyRows() { 
+            for(let i=0; i<8; i++) { 
+                const tr = document.createElement('tr'); tr.className = "opacity-20 h-10"; 
+                tr.innerHTML = '<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>'; 
+                recordsBody.appendChild(tr); 
+            } 
+        }
 
         // Init
-        initAuth();
+        [mobileIn, shopIn, cityIn, districtIn, rrpIn, pointsIn, perfIn1, perfIn2].forEach(el => el.addEventListener('input', updateCalculations));
+        monthIns.forEach(input => input.addEventListener('input', (e) => {
+            const c = e.target.closest('.smart-cell-container');
+            const s = calculateExpr(e.target.value);
+            c.querySelector('.sum-indicator').innerText = s;
+            if (e.target.value.includes('+')) c.classList.add('has-sum'); else c.classList.remove('has-sum');
+            updateCalculations();
+        }));
+
         initEmptyRows();
         handleMonthChange();
         updateCategoryLabels();
         setupNavigation();
-
-        [inputMobile, inputShop, inputCity, inputDistrict, inputRRP, inputPoints, perfInput1, perfInput2].forEach(el => el.addEventListener('input', updateCalculations));
-        monthInputs.forEach(input => input.addEventListener('input', (e) => {
-            const container = e.target.closest('.smart-cell-container');
-            const sum = calculateExpression(e.target.value);
-            container.querySelector('.sum-indicator').innerText = sum;
-            if (e.target.value.includes('+')) container.classList.add('has-sum');
-            else container.classList.remove('has-sum');
-            updateCalculations();
-        }));
     </script>
 </body>
 </html>
