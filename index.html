@@ -218,7 +218,7 @@
                     <tr>
                         <th style="width: 100px;">Target</th>
                         <td class="flex items-center space-x-2">
-                            <input type="number" id="inputPoints" placeholder="Points" value="3000" class="text-blue-600">
+                            <input type="number" id="inputPoints" placeholder="Points" value="3000" class="text-blue-600 focusable">
                             <span class="text-gray-400 font-bold text-xs">Pts</span>
                         </td>
                     </tr>
@@ -229,12 +229,12 @@
                 <table class="w-full">
                     <tr>
                         <th style="width: 100px;">Mobile</th>
-                        <td><input type="text" id="inputMobile" placeholder="Enter Mobile No."></td>
+                        <td><input type="text" id="inputMobile" placeholder="Enter Mobile No." class="focusable"></td>
                     </tr>
                     <tr>
                         <th>Category</th>
                         <td>
-                            <select id="inputCategory" onchange="updateCategoryLabels()" class="cursor-pointer">
+                            <select id="inputCategory" onchange="updateCategoryLabels()" class="cursor-pointer focusable">
                                 <option value="">Select Category</option>
                                 <option value="Retailer">Retailer</option>
                                 <option value="Dealer">Dealer</option>
@@ -242,9 +242,9 @@
                             </select>
                         </td>
                     </tr>
-                    <tr><th>Shop name</th><td><input type="text" id="inputShop" placeholder="Shop Name"></td></tr>
-                    <tr><th>City</th><td><input type="text" id="inputCity" placeholder="City"></td></tr>
-                    <tr><th>District</th><td><input type="text" id="inputDistrict" placeholder="District"></td></tr>
+                    <tr><th>Shop name</th><td><input type="text" id="inputShop" placeholder="Shop Name" class="focusable"></td></tr>
+                    <tr><th>City</th><td><input type="text" id="inputCity" placeholder="City" class="focusable"></td></tr>
+                    <tr><th>District</th><td><input type="text" id="inputDistrict" placeholder="District" class="focusable"></td></tr>
                 </table>
             </div>
 
@@ -253,19 +253,19 @@
                 <table class="w-full">
                     <tr class="bg-amber-50/50">
                         <th style="width: 100px;">RRP (OLD)</th>
-                        <td><input type="number" id="inputRRP" placeholder="0"></td>
+                        <td><input type="number" id="inputRRP" placeholder="0" class="focusable"></td>
                     </tr>
                     <tr>
                         <th id="catLabel1">GSD</th>
-                        <td><input type="text" id="perfInput1" placeholder="0"></td>
+                        <td><input type="text" id="perfInput1" placeholder="0" class="focusable"></td>
                     </tr>
                     <tr>
                         <th id="catLabel2">RRP-GSD</th>
-                        <td><input type="text" id="perfInput2" placeholder="0"></td>
+                        <td><input type="text" id="perfInput2" placeholder="0" class="focusable"></td>
                     </tr>
                     <tr class="bg-blue-50/30">
                         <th>
-                            <select id="selectMainMonth" onchange="handleMonthChange()" class="bg-transparent p-0 h-auto cursor-pointer">
+                            <select id="selectMainMonth" onchange="handleMonthChange()" class="bg-transparent p-0 h-auto cursor-pointer focusable">
                                 <option value="Jan" selected>Jan</option>
                                 <option value="Feb">Feb</option>
                                 <option value="Mar">Mar</option>
@@ -282,14 +282,14 @@
                         </th>
                         <td>
                             <div class="smart-cell-container">
-                                <input type="text" class="month-input" id="valMonth1" placeholder="0">
+                                <input type="text" class="month-input focusable" id="valMonth1" placeholder="0">
                                 <div class="sum-indicator">0</div>
                             </div>
                         </td>
                     </tr>
-                    <tr><th id="labelMonth2">Nov</th><td><div class="smart-cell-container"><input type="text" class="month-input" id="valMonth2" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
-                    <tr><th id="labelMonth3">Oct</th><td><div class="smart-cell-container"><input type="text" class="month-input" id="valMonth3" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
-                    <tr><th id="labelMonth4">Sep</th><td><div class="smart-cell-container"><input type="text" class="month-input" id="valMonth4" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
+                    <tr><th id="labelMonth2">Nov</th><td><div class="smart-cell-container"><input type="text" class="month-input focusable" id="valMonth2" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
+                    <tr><th id="labelMonth3">Oct</th><td><div class="smart-cell-container"><input type="text" class="month-input focusable" id="valMonth3" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
+                    <tr><th id="labelMonth4">Sep</th><td><div class="smart-cell-container"><input type="text" class="month-input focusable" id="valMonth4" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
                 </table>
                 <div class="p-2 bg-slate-50 border-t border-slate-200">
                     <button onclick="clearCurrentForm()" class="w-full py-2 text-[11px] font-bold text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-all uppercase tracking-wider flex items-center justify-center space-x-2">
@@ -310,7 +310,7 @@
                         <tr>
                             <th style="width: 25%;">Shop / Mobile</th>
                             <th style="width: 15%;">RRP (OLD)</th>
-                            <th style="width: 15%;">3 Mnth Sum</th>
+                            <th style="width: 15%;">3 Month Sum</th>
                             <th style="width: 15%;">Total Points</th>
                             <th class="text-center">Status</th>
                         </tr>
@@ -340,7 +340,7 @@
                                 <th>Mobile</th>
                                 <th>City / District</th>
                                 <th>RRP(OLD)</th>
-                                <th>3 Mnth Sum</th>
+                                <th>3 Month Sum</th>
                                 <th>Total</th>
                                 <th>Status</th>
                             </tr>
@@ -518,6 +518,24 @@
             updateCalculations();
         }
 
+        function copyTableData() {
+            let csv = "Shop Name,Mobile,City/District,RRP(OLD),3 Month Sum,Total,Status\n";
+            const rows = document.querySelectorAll('#recordsBody tr:not(.opacity-20)');
+            rows.forEach(row => {
+                const cols = row.querySelectorAll('td');
+                if (cols.length > 0) {
+                    const rowData = Array.from(cols).map(c => c.innerText.replace(/,/g, '')).join(',');
+                    csv += rowData + "\n";
+                }
+            });
+            const el = document.createElement('textarea');
+            el.value = csv;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+        }
+
         function printReport() {
             if (!inputMobile.value) return;
             const status = document.getElementById('previewStatus').innerText;
@@ -540,6 +558,34 @@
 
         function initEmptyRows() { for(let i=0; i<15; i++) { const tr = document.createElement('tr'); tr.className = "opacity-20 h-10"; tr.innerHTML = '<td></td><td></td><td></td><td></td><td></td><td></td><td></td>'; recordsBody.appendChild(tr); } }
 
+        // Setup Enter key navigation
+        function setupNavigation() {
+            const focusables = Array.from(document.querySelectorAll('.focusable'));
+            focusables.forEach((el, index) => {
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        // If it's the last month field, add the row
+                        if (el.id === 'valMonth4') {
+                            addRow();
+                        } else {
+                            // Otherwise, move to the next field
+                            const next = focusables[index + 1];
+                            if (next) {
+                                if (next.disabled) {
+                                     // Skip disabled fields (like RRP-GSD for Dealer)
+                                     const afterNext = focusables[index + 2];
+                                     if (afterNext) afterNext.focus();
+                                } else {
+                                     next.focus();
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
         [inputMobile, inputShop, inputCity, inputDistrict, inputRRP, inputPoints, perfInput1, perfInput2].forEach(el => el.addEventListener('input', updateCalculations));
         monthInputs.forEach(input => input.addEventListener('input', (e) => {
             const container = e.target.closest('.smart-cell-container');
@@ -553,6 +599,7 @@
         initEmptyRows();
         handleMonthChange();
         updateCategoryLabels();
+        setupNavigation();
     </script>
 </body>
 </html>
