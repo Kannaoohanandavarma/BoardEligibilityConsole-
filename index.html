@@ -485,10 +485,9 @@
         }
 
         function clearAll() {
-            if(confirm("Boss, are you sure you want to delete all verified records?")) {
-                recordsBody.innerHTML = '';
-                initEmptyRows();
-            }
+            // Confirmation removed as requested by boss
+            recordsBody.innerHTML = '';
+            initEmptyRows();
         }
 
         function copyTableData() {
