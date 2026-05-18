@@ -183,13 +183,14 @@
         .pdf-box { border: 2px solid black; }
         .pdf-row { display: flex; border-bottom: 1px solid black; }
         .pdf-header { background: #e5e7eb; text-align: center; font-weight: bold; padding: 4px; text-transform: uppercase; border-bottom: 2px solid black; }
-        .pdf-status-bar { height: 36px; border-bottom: 2px solid black; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
+        .pdf-status-bar { height: 30px; border-bottom: 2px solid black; }
         .pdf-label { width: 120px; font-weight: bold; padding: 6px 10px; border-right: 1px solid black; font-size: 14px; }
         .pdf-value { flex: 1; padding: 6px 10px; font-size: 14px; }
         .pdf-grid-3 { display: flex; text-align: center; }
         .pdf-grid-col { flex: 1; border-right: 1px solid black; }
         .pdf-grid-col:last-child { border-right: none; }
-        .pdf-grid-label { font-weight: bold; padding: 8px; border-bottom: 1px solid black; min-height: 40px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        .pdf-grid-label { font-weight: bold; padding: 8px; border-bottom: 1px solid black; min-height: 40px; display: flex; align-items: center; justify-content: center; }
+        .pdf-grid-sub { font-size: 11px; font-weight: bold; padding: 4px; border-bottom: 1px solid black; }
         .pdf-grid-value { font-weight: bold; padding: 10px; background: #ffff00; font-size: 18px; }
     </style>
 </head>
@@ -338,23 +339,28 @@
     <!-- Hidden PDF Export Template -->
     <div id="pdfTemplate">
         <div class="pdf-box">
-            <div class="pdf-header">Board Eligibility Status</div>
-            <div id="pdfStatusBar" class="pdf-status-bar"></div>
-            <div class="pdf-row"><div class="pdf-label">Mobile No</div><div id="pdfMobile" class="pdf-value"></div></div>
-            <div class="pdf-row"><div class="pdf-label">Shop Name</div><div id="pdfShop" class="pdf-value"></div></div>
-            <div class="pdf-row"><div class="pdf-label">Location</div><div id="pdfLocation" class="pdf-value"></div></div>
+            <div class="pdf-header">STATUS</div>
+            <div class="pdf-status-bar" id="pdfStatusColor"></div>
+            <div class="pdf-row"><div class="pdf-label">Mobile No</div><div class="pdf-value" id="pdfMobile"></div></div>
+            <div class="pdf-row"><div class="pdf-label">Category</div><div class="pdf-value" id="pdfCategory"></div></div>
+            <div class="pdf-row"><div class="pdf-label">Shop name</div><div class="pdf-value" id="pdfShop"></div></div>
+            <div class="pdf-row"><div class="pdf-label">City</div><div class="pdf-value" id="pdfCity"></div></div>
+            <div class="pdf-row"><div class="pdf-label">District</div><div class="pdf-value" id="pdfDistrict"></div></div>
             <div class="pdf-grid-3">
                 <div class="pdf-grid-col">
                     <div class="pdf-grid-label">RRP(OLD)</div>
-                    <div id="pdfValRRP" class="pdf-grid-value">0</div>
+                    <div class="pdf-grid-sub">TOTAL</div>
+                    <div class="pdf-grid-value" id="pdfRRP">0</div>
                 </div>
                 <div class="pdf-grid-col">
-                    <div id="pdfCatHeader" class="pdf-grid-label">GSD</div>
-                    <div id="pdfValActual" class="pdf-grid-value">0</div>
+                    <div class="pdf-grid-label" id="pdfGSDLabel">GSD</div>
+                    <div class="pdf-grid-sub">ACTUAL POINTS</div>
+                    <div class="pdf-grid-value" id="pdfGSD">0</div>
                 </div>
                 <div class="pdf-grid-col">
-                    <div id="pdfValFinalHeader" class="pdf-grid-label">3M FINAL</div>
-                    <div id="pdfValFinal" class="pdf-grid-value">0</div>
+                    <div class="pdf-grid-label">3MONTHS</div>
+                    <div class="pdf-grid-sub">TOTAL</div>
+                    <div class="pdf-grid-value" id="pdf3Months">0</div>
                 </div>
             </div>
         </div>
@@ -367,19 +373,18 @@
         let startCell = { r: -1, c: -1 };
 
         // Elements
-        const mobileEl = document.getElementById('inputMobile');
-        const shopEl = document.getElementById('inputShop');
-        const cityEl = document.getElementById('inputCity');
-        const distEl = document.getElementById('inputDistrict');
-        const rrpEl = document.getElementById('inputRRP');
-        const catEl = document.getElementById('inputCategory');
-        const targetEl = document.getElementById('inputPoints');
-        const monthSel = document.getElementById('selectMainMonth');
-        const p1El = document.getElementById('perfInput1');
-        const p2El = document.getElementById('perfInput2');
+        const inputMobile = document.getElementById('inputMobile');
+        const inputShop = document.getElementById('inputShop');
+        const inputCity = document.getElementById('inputCity');
+        const inputDistrict = document.getElementById('inputDistrict');
+        const inputRRP = document.getElementById('inputRRP');
+        const inputCategory = document.getElementById('inputCategory');
+        const inputPoints = document.getElementById('inputPoints');
+        const selectMainMonth = document.getElementById('selectMainMonth');
         const monthInputs = document.querySelectorAll('.month-input');
-        const historyBody = document.getElementById('historyBody');
-        const historyTable = document.getElementById('historyTable');
+        const perfInput1 = document.getElementById('perfInput1');
+        const perfInput2 = document.getElementById('perfInput2');
+        const recordsBody = document.getElementById('recordsBody');
 
         // --- EXCEL-STYLE SELECTION & COPY LOGIC ---
         
