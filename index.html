@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-           --primary: #2563eb;
+            --primary: #2563eb;
             --primary-dark: #1e40af;
             --bg-gray: #f8fafc;
             --border-color: #e2e8f0;
@@ -23,15 +23,18 @@
             user-select: text;
         }
 
+        /* Prevent ugly native text selections when dragging/selecting cells */
+        body.selecting-cells {
+            user-select: none !important;
+        }
+
         .header-banner {
             background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%);
-            color: white;
-            padding: 0.75rem 2.5rem;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
 
         .header-logo {
-            height: 50px;
+            height: 44px;
             width: auto;
             object-fit: contain;
             background: white;
@@ -67,28 +70,22 @@
         }
 
         td {
-            padding: 8px 12px;
+            padding: 10px 12px;
             border-bottom: 1px solid var(--border-color);
             border-right: 1px solid var(--border-color);
             background: white;
             transition: background 0.05s;
             color: #1e293b;
-            position: relative;
-            cursor: cell;
+            font-size: 13px;
         }
 
-        /* --- Excel-Style Rectangular Selection --- */
-        .selected-cell {
-            background-color: #dbeafe !important;
-            box-shadow: inset 0 0 0 1px #3b82f6;
-        }
-        
-        .dragging {
-            user-select: none;
-        }
-
-        tr:hover td { background-color: #f8fafc; }
         td:last-child, th:last-child { border-right: none; }
+
+        /* Highlight state for spreadsheet cell selection */
+        td.cell-selected {
+            background-color: #eff6ff !important; /* Sky blue bg tint */
+            box-shadow: inset 0 0 0 2px #3b82f6 !important; /* Solid blue layout frame outline */
+        }
 
         input, select {
             width: 100%;
@@ -99,6 +96,15 @@
             border-radius: 4px;
             transition: all 0.2s;
             font-size: 13px;
+            font-weight: 400 !important;
+        }
+
+        #selectMainMonth {
+            font-weight: 700 !important;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #1e293b;
         }
 
         input:focus, select:focus {
@@ -134,7 +140,7 @@
             background-color: white;
             color: #1e293b;
             border: 1px solid var(--border-color);
-            padding: 10px 24px;
+            padding: 10px 20px;
             border-radius: 8px;
             font-weight: 600;
             font-size: 0.875rem;
@@ -158,8 +164,10 @@
             font-weight: 700;
             text-align: center;
             border-radius: 4px;
-            padding: 4px;
+            padding: 4px 8px;
             font-size: 0.7rem;
+            border: 1px solid #a7f3d0;
+            display: inline-block;
         }
 
         .status-not-eligible {
@@ -168,68 +176,101 @@
             font-weight: 700;
             text-align: center;
             border-radius: 4px;
-            padding: 4px;
+            padding: 4px 8px;
             font-size: 0.7rem;
+            border: 1px solid #fecaca;
+            display: inline-block;
         }
 
-        /* PDF Styles - Hidden but formatted for capture */
+        /* Styles for high-fidelity off-screen PDF printing */
         #pdfTemplate {
-            display: none;
-            width: 500px;
-            padding: 20px;
+            width: 580px;
+            padding: 24px;
             background: white;
             font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
         }
-        .pdf-box { border: 2px solid black; }
-        .pdf-row { display: flex; border-bottom: 1px solid black; }
-        .pdf-header { background: #e5e7eb; text-align: center; font-weight: bold; padding: 4px; text-transform: uppercase; border-bottom: 2px solid black; }
-        .pdf-status-bar { height: 30px; border-bottom: 2px solid black; }
-        .pdf-label { width: 120px; font-weight: bold; padding: 6px 10px; border-right: 1px solid black; font-size: 14px; }
-        .pdf-value { flex: 1; padding: 6px 10px; font-size: 14px; }
-        .pdf-grid-3 { display: flex; text-align: center; }
-        .pdf-grid-col { flex: 1; border-right: 1px solid black; }
+        .pdf-box { border: 2px solid #1e293b; border-radius: 8px; overflow: hidden; background: white; }
+        .pdf-row { display: flex; border-bottom: 1px solid #cbd5e1; }
+        .pdf-header { background: #1e293b; color: white; text-align: center; font-weight: bold; padding: 12px; text-transform: uppercase; font-size: 16px; letter-spacing: 0.05em; }
+        .pdf-status-bar { padding: 10px; border-bottom: 2px solid #1e293b; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 14px; text-transform: uppercase; letter-spacing: 0.03em; }
+        .pdf-label { width: 150px; font-weight: bold; padding: 10px 14px; border-right: 1px solid #cbd5e1; font-size: 13px; background: #f8fafc; color: #475569; }
+        .pdf-value { flex: 1; padding: 10px 14px; font-size: 13px; color: #1e293b; font-weight: 500; }
+        .pdf-grid-3 { display: flex; text-align: center; background: white; }
+        .pdf-grid-col { flex: 1; border-right: 1px solid #1e293b; display: flex; flex-direction: column; }
         .pdf-grid-col:last-child { border-right: none; }
-        .pdf-grid-label { font-weight: bold; padding: 8px; border-bottom: 1px solid black; min-height: 40px; display: flex; align-items: center; justify-content: center; }
-        .pdf-grid-sub { font-size: 11px; font-weight: bold; padding: 4px; border-bottom: 1px solid black; }
-        .pdf-grid-value { font-weight: bold; padding: 10px; background: #ffff00; font-size: 18px; }
+        .pdf-grid-label { font-weight: bold; padding: 10px; border-bottom: 1px solid #1e293b; min-height: 44px; display: flex; align-items: center; justify-content: center; font-size: 12px; background: #f1f5f9; color: #334155; }
+        .pdf-grid-sub { font-size: 10px; font-weight: 700; padding: 6px; border-bottom: 1px solid #1e293b; color: #64748b; background: #f8fafc; }
+        .pdf-grid-value { font-weight: bold; padding: 14px; background: #fef08a; font-size: 18px; color: #1e293b; flex-grow: 1; display: flex; align-items: center; justify-content: center; }
+
+        /* Toast notifications */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
     </style>
 </head>
-<body class="p-0 m-0">
+<body class="p-0 m-0 min-h-screen flex flex-col">
 
-    <div class="header-banner flex justify-between items-center">
+    <!-- Toast alerts container -->
+    <div id="toast-container"></div>
+
+    <!-- Header -->
+    <div class="header-banner flex justify-between items-center py-4 px-8">
         <div class="flex items-center space-x-6">
             <img src="Goldmedal_Electricals_Logo.svg.png" alt="Goldmedal Logo" class="header-logo" onerror="this.src='https://placehold.co/120x40?text=Goldmedal'">
-            <h1 class="text-2xl font-700 tracking-tight">Board Eligibility Console</h1>
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight text-white leading-tight">Board Eligibility Check Console</h1>
+                <p class="text-xs text-blue-100 opacity-90 font-medium">Professional Calculation Suite</p>
+            </div>
         </div>
-        <div class="text-sm font-normal opacity-80">v4.6 Professional Mode</div>
+        <div class="text-right">
+            <div class="text-xs font-semibold bg-blue-700/50 text-blue-100 px-3 py-1.5 rounded-full inline-block border border-blue-500/30">
+                v4.9 Spreadsheet Mode
+            </div>
+        </div>
     </div>
 
-    <div class="flex p-8 items-start">
-        <!-- Sidebar -->
-        <div class="sidebar-container space-y-6">
-            <div class="glass-panel">
+    <!-- Main Workspace -->
+    <div class="flex flex-col lg:flex-row p-6 lg:p-8 items-start gap-8 flex-1">
+        
+        <!-- Sidebar Input Section -->
+        <div class="w-full lg:w-[360px] flex-shrink-0 space-y-6">
+            
+            <!-- Global Target Control -->
+            <div class="glass-panel border-l-4 border-blue-600">
+                <div class="px-4 py-2.5 bg-slate-100 border-b border-slate-200 flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Elgibility</span>
+                    <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                </div>
                 <table class="w-full">
                     <tr>
-                        <th style="width: 100px;">Target</th>
-                        <td class="flex items-center space-x-2">
-                            <input type="number" id="inputPoints" placeholder="Points" value="3000" class="text-blue-600">
-                            <span class="text-gray-400 font-bold text-xs">Pts</span>
+                        <th style="width: 120px;" class="text-left pl-4">Target Threshold</th>
+                        <td class="flex items-center space-x-2 px-3 py-2">
+                            <input type="number" id="inputPoints" placeholder="Points" value="3000" class="text-blue-600 font-bold text-base focus:bg-blue-50">
+                            <span class="text-blue-600 font-bold text-xs bg-blue-50 px-2 py-1 rounded">PTS</span>
                         </td>
                     </tr>
                 </table>
             </div>
 
+            <!-- Profile Parameters -->
             <div class="glass-panel">
+                <div class="px-4 py-2.5 bg-slate-100 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase tracking-wider">Account Details</div>
                 <table class="w-full">
                     <tr>
-                        <th style="width: 100px;">Mobile</th>
-                        <td><input type="text" id="inputMobile" placeholder="Enter Mobile No."></td>
+                        <th style="width: 120px;">Mobile No.</th>
+                        <td><input type="text" id="inputMobile" placeholder="Enter 10-digit Mobile No."></td>
                     </tr>
                     <tr>
                         <th>Category</th>
                         <td>
-                            <select id="inputCategory" onchange="updateCategoryLabels()" class="cursor-pointer">
-                                <option value="">Select Category</option>
+                            <select id="inputCategory" onchange="updateCategoryLabels()" class="cursor-pointer font-medium text-slate-800">
                                 <option value="Retailer">Retailer</option>
                                 <option value="Dealer">Dealer</option>
                                 <option value="Distributor">Distributor</option>
@@ -242,12 +283,15 @@
                 </table>
             </div>
 
+            <!-- Quantitative Datapoints -->
             <div class="glass-panel">
-                <div class="px-3 py-2 bg-slate-100 border-b border-slate-200 text-[10px] font-bold text-slate-500 uppercase tracking-wider">New Points Data</div>
+                <div class="px-4 py-2.5 bg-slate-100 border-b border-slate-200 flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-600 uppercase tracking-wider">Points Data</span>
+                </div>
                 <table class="w-full">
-                    <tr class="bg-amber-50/50">
-                        <th style="width: 100px;">RRP (OLD)</th>
-                        <td><input type="number" id="inputRRP" placeholder="0"></td>
+                    <tr class="bg-amber-50/40">
+                        <th style="width: 120px;">RRP (OLD)</th>
+                        <td><input type="text" id="inputRRP" placeholder="0" class="font-medium text-amber-800"></td>
                     </tr>
                     <tr>
                         <th id="catLabel1">GSD</th>
@@ -257,9 +301,9 @@
                         <th id="catLabel2">RRP-GSD</th>
                         <td><input type="text" id="perfInput2" placeholder="0"></td>
                     </tr>
-                    <tr class="bg-blue-50/30">
+                    <tr class="bg-blue-50/20">
                         <th>
-                            <select id="selectMainMonth" onchange="handleMonthChange()" class="bg-transparent p-0 h-auto cursor-pointer">
+                            <select id="selectMainMonth" onchange="handleMonthChange()" class="bg-transparent p-0 h-auto cursor-pointer text-blue-700 font-bold">
                                 <option value="Jan" selected>Jan</option>
                                 <option value="Feb">Feb</option>
                                 <option value="Mar">Mar</option>
@@ -281,122 +325,170 @@
                             </div>
                         </td>
                     </tr>
-                    <tr><th id="labelMonth2">Nov</th><td><div class="smart-cell-container"><input type="text" class="month-input" id="valMonth2" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
-                    <tr><th id="labelMonth3">Oct</th><td><div class="smart-cell-container"><input type="text" class="month-input" id="valMonth3" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
-                    <tr><th id="labelMonth4">Sep</th><td><div class="smart-cell-container"><input type="text" class="month-input" id="valMonth4" placeholder="0"><div class="sum-indicator">0</div></div></td></tr>
+                    <tr>
+                        <th id="labelMonth2">Nov</th>
+                        <td>
+                            <div class="smart-cell-container">
+                                <input type="text" class="month-input" id="valMonth2" placeholder="0">
+                                <div class="sum-indicator">0</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th id="labelMonth3">Oct</th>
+                        <td>
+                            <div class="smart-cell-container">
+                                <input type="text" class="month-input" id="valMonth3" placeholder="0">
+                                <div class="sum-indicator">0</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th id="labelMonth4">Sep</th>
+                        <td>
+                            <div class="smart-cell-container">
+                                <input type="text" class="month-input" id="valMonth4" placeholder="0">
+                                <div class="sum-indicator">0</div>
+                            </div>
+                        </td>
+                    </tr>
                 </table>
                 <div class="p-2 bg-slate-50 border-t border-slate-200">
-                    <button onclick="clearCurrentForm()" class="w-full py-2 text-[11px] font-bold text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-all uppercase tracking-wider flex items-center justify-center space-x-2">
+                    <button onclick="clearCurrentForm()" class="w-full py-2.5 text-[11px] font-bold text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-all uppercase tracking-wider flex items-center justify-center space-x-2">
                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-                        <span>Clear Current Form</span>
+                        <span>Clear Entries</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-list-container space-y-6">
-            <!-- Active Preview -->
-            <div class="glass-panel border-blue-200 bg-blue-50/20">
-                 <div class="px-4 py-2 bg-blue-600 text-white text-[10px] font-bold uppercase tracking-widest">Entry Preview</div>
-                 <table class="w-full">
+        <!-- Main Workspace Presentation -->
+        <div class="flex-grow w-full space-y-6">
+            
+            <!-- Real-time Status Preview Block -->
+            <div class="glass-panel border border-blue-200 bg-blue-50/10">
+                 <div class="px-4 py-3 bg-blue-600 text-white text-[11px] font-bold uppercase tracking-widest flex justify-between items-center">
+                     <span>Data Preview</span>
+                 </div>
+                 <table class="w-full text-left">
                     <thead>
                         <tr>
-                            <th style="width: 25%;">Shop / Mobile</th>
-                            <th style="width: 15%;">RRP (OLD)</th>
-                            <th style="width: 15%;">3 Mnth Sum</th>
-                            <th style="width: 15%;">Total Points</th>
-                            <th class="text-center">Status</th>
+                            <th class="text-center" style="width: 30%;">Shop / Mobile</th>
+                            <th class="text-center" style="width: 15%;">RRP (old points)</th>
+                            <th class="text-center" style="width: 15%;">3 Months</th>
+                            <th class="text-center" style="width: 15%;">GSD/GDP/GRP</th>
+                            <th class="text-center" style="width: 25%;">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr class="h-16">
-                            <td id="previewMobile" class="text-[11px] font-semibold">-</td>
-                            <td id="previewRRPDisplay" class="text-[11px]">0</td>
-                            <td id="preview3Months" class="text-[11px]">0</td>
-                            <td id="previewGSDTotal" class="text-[11px]">0</td>
+                            <td class="font-semibold text-slate-800" id="previewMobile">-</td>
+                            <td id="previewRRPDisplay" class="font-medium text-slate-700">0</td>
+                            <td id="preview3Months" class="font-semibold text-blue-600">0</td>
+                            <td id="previewGSDTotal" class="font-medium text-slate-700">0</td>
                             <td id="previewStatus" class="text-center px-4"></td>
                         </tr>
                     </tbody>
                  </table>
             </div>
 
-            <!-- List -->
-            <div class="glass-panel">
-                <div class="px-4 py-3 bg-white border-b border-slate-200 flex justify-between items-center">
-                    <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider">Entry List</h2>
+            <!-- Compiled Consolidated List (Spreadsheet Behavior Enabled) -->
+            <div class="glass-panel flex flex-col">
+                <div class="px-5 py-4 bg-white border-b border-slate-200 flex justify-between items-center flex-wrap gap-2">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-800">Logs</h2>
+                        <p class="text-xs text-slate-500">Drag to select cells. Press <b>Ctrl + C</b> to copy.</p>
+                    </div>
+                    <div class="flex items-center space-x-2 animate-fade-in">
+                        <input type="text" id="tableSearch" oninput="renderTable()" placeholder="Search mobile or shop..." class="border border-slate-200 rounded px-3 py-1.5 w-60 text-xs bg-slate-50 focus:bg-white">
+                    </div>
                 </div>
-                <div class="max-h-[500px] overflow-y-auto">
+                <div class="max-h-[480px] overflow-y-auto">
                     <table class="w-full" id="mainRecordsTable">
-                        <thead class="sticky top-0 z-20">
+                        <thead class="sticky top-0 z-20 shadow-sm">
                             <tr>
-                                <th>Shop Name</th>
-                                <th>Mobile</th>
+                                <th>Shop Name / Mobile</th>
                                 <th>City / District</th>
-                                <th>RRP(OLD)</th>
-                                <th>3 Mnth Sum</th>
-                                <th>Total</th>
+                                <th>Category</th>
+                                <th>RRP (old)</th>
+                                <th>3-Months</th>
+                                <th>GSD/GDP/GRP</th>
                                 <th>Status</th>
+                                <th class="text-center" style="width: 120px;">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="recordsBody"></tbody>
+                        <tbody id="recordsBody">
+                            <!-- Populated Dynamically -->
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Actions -->
-        <div class="flex flex-col space-y-3 ml-4 sticky top-10">
-            <button class="btn-action btn-add flex items-center justify-center space-x-2" onclick="addRow()">
+        <!-- Sidebar Actions Panel -->
+        <div class="w-full lg:w-auto flex lg:flex-col gap-3 sticky lg:top-8 shrink-0 flex-wrap">
+            <button id="btnCommit" class="btn-action btn-add flex-1 lg:flex-none flex items-center justify-center space-x-2 shadow-md hover:shadow-lg" onclick="addRow()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                <span>Add Record</span>
+                <span>Add</span>
             </button>
-            <button class="btn-action flex items-center justify-center space-x-2" onclick="copyTableData()">
+            <button class="btn-action flex-1 lg:flex-none flex items-center justify-center space-x-2 text-slate-700 hover:border-slate-400" onclick="copyTableData()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
                 <span>Copy List</span>
             </button>
-            <button class="btn-action flex items-center justify-center bg-slate-800 text-white space-x-2" onclick="printReport()">
+            <button class="btn-action flex-1 lg:flex-none flex items-center justify-center bg-slate-800 text-white hover:bg-slate-900 hover:shadow-md space-x-2 border-none" onclick="printReport(null)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                <span>Print</span>
+                <span>Print PDF</span>
             </button>
-            <button class="btn-action flex items-center justify-center space-x-2 text-red-600 border-red-200" onclick="clearAll()">
+            <button class="btn-action flex-1 lg:flex-none flex items-center justify-center space-x-2 text-red-600 border-red-200 hover:bg-red-50" onclick="clearAll()">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-                <span>Clear All Records</span>
+                <span>Wipe Data</span>
             </button>
         </div>
     </div>
 
-    <!-- PDF Template -->
-    <div id="pdfTemplate">
-        <div class="pdf-box">
-            <div class="pdf-header">STATUS</div>
-            <div class="pdf-status-bar" id="pdfStatusColor"></div>
-            <div class="pdf-row"><div class="pdf-label">Mobile No</div><div class="pdf-value" id="pdfMobile"></div></div>
-            <div class="pdf-row"><div class="pdf-label">Category</div><div class="pdf-value" id="pdfCategory"></div></div>
-            <div class="pdf-row"><div class="pdf-label">Shop name</div><div class="pdf-value" id="pdfShop"></div></div>
-            <div class="pdf-row"><div class="pdf-label">City</div><div class="pdf-value" id="pdfCity"></div></div>
-            <div class="pdf-row"><div class="pdf-label">District</div><div class="pdf-value" id="pdfDistrict"></div></div>
-            <div class="pdf-grid-3">
-                <div class="pdf-grid-col">
-                    <div class="pdf-grid-label">RRP(OLD)</div>
-                    <div class="pdf-grid-sub">TOTAL</div>
-                    <div class="pdf-grid-value" id="pdfRRP">0</div>
-                </div>
-                <div class="pdf-grid-col">
-                    <div class="pdf-grid-label" id="pdfGSDLabel">GSD</div>
-                    <div class="pdf-grid-sub">ACTUAL POINTS</div>
-                    <div class="pdf-grid-value" id="pdfGSD">0</div>
-                </div>
-                <div class="pdf-grid-col">
-                    <div class="pdf-grid-label">3MONTHS</div>
-                    <div class="pdf-grid-sub">TOTAL</div>
-                    <div class="pdf-grid-value" id="pdf3Months">0</div>
+    <!-- Dynamic Offscreen Frame for Pixel-Perfect PDF Output (Never gets clipped by display:none cycles) -->
+    <div style="position: absolute; left: -9999px; top: -9999px;">
+        <div id="pdfTemplate">
+            <div class="pdf-box">
+                <div class="pdf-header" id="pdfHeaderCategory">RETAILER ELIGIBILITY ASSESSMENT</div>
+                <div class="pdf-status-bar" id="pdfStatusColor">STATUS DETAILS</div>
+                <div class="pdf-row"><div class="pdf-label">Mobile No</div><div class="pdf-value" id="pdfMobile"></div></div>
+                <div class="pdf-row"><div class="pdf-label">Shop name</div><div class="pdf-value" id="pdfShop"></div></div>
+                <div class="pdf-row"><div class="pdf-label">City</div><div class="pdf-value" id="pdfCity"></div></div>
+                <div class="pdf-row"><div class="pdf-label">District</div><div class="pdf-value" id="pdfDistrict"></div></div>
+                <div class="pdf-grid-3">
+                    <div class="pdf-grid-col">
+                        <div class="pdf-grid-label">RRP(OLD)</div>
+                        <div class="pdf-grid-sub">POINTS</div>
+                        <div class="pdf-grid-value" id="pdfRRP">0</div>
+                    </div>
+                    <div class="pdf-grid-col">
+                        <div class="pdf-grid-label" id="pdfGSDLabel">GSD</div>
+                        <div class="pdf-grid-sub">POINTS TARGET</div>
+                        <div class="pdf-grid-value" id="pdfGSD">0</div>
+                    </div>
+                    <div class="pdf-grid-col">
+                        <div class="pdf-grid-label">3 MONTHS DIFF</div>
+                        <div class="pdf-grid-sub">CALCULATED VALUE</div>
+                        <div class="pdf-grid-value" id="pdf3Months">0</div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // System variables & State Management
+        let records = [];
+        let editIndex = null;
+
+        // Spreadsheet grid selection coordinates tracker
+        let isSelecting = false;
+        let startRow = null;
+        let startCol = null;
+        let currentRow = null;
+        let currentCol = null;
+
         const inputMobile = document.getElementById('inputMobile');
         const inputShop = document.getElementById('inputShop');
         const inputCity = document.getElementById('inputCity');
@@ -412,9 +504,85 @@
 
         const monthsOrder = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
+        // Unified enter-navigation control sequence
+        const focusOrder = [
+            'inputMobile',
+            'inputCategory',
+            'inputShop',
+            'inputCity',
+            'inputDistrict',
+            'inputRRP',
+            'perfInput1',
+            'perfInput2',
+            'selectMainMonth',
+            'valMonth1',
+            'valMonth2',
+            'valMonth3',
+            'valMonth4'
+        ];
+
+        // Register Keydown navigations
+        focusOrder.forEach((id, index) => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault(); // Stop any form submit actions
+                        if (index < focusOrder.length - 1) {
+                            const nextEl = document.getElementById(focusOrder[index + 1]);
+                            if (nextEl) {
+                                nextEl.focus();
+                                if (nextEl.select) {
+                                    nextEl.select(); // auto-highlight inputs for faster entry
+                                }
+                            }
+                        } else {
+                            // Hit enter on the final field - Commit the row
+                            addRow();
+                        }
+                    }
+                });
+            }
+        });
+
+        // Show elegant visual notifications without breaking iframe sandbox
+        function showToast(message, type = "success") {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `flex items-center space-x-2 px-4 py-3 rounded-lg shadow-lg border text-sm transition-all duration-300 transform translate-y-2 opacity-0 ${
+                type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 
+                type === 'info' ? 'bg-blue-50 border-blue-200 text-blue-800' :
+                'bg-rose-50 border-rose-200 text-rose-800'
+            }`;
+            
+            let icon = '';
+            if (type === 'success') {
+                icon = `<svg class="w-4 h-4 shrink-0 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            } else if (type === 'info') {
+                icon = `<svg class="w-4 h-4 shrink-0 text-blue-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            } else {
+                icon = `<svg class="w-4 h-4 shrink-0 text-rose-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+            }
+
+            toast.innerHTML = `${icon}<span>${message}</span>`;
+            container.appendChild(toast);
+
+            // Trigger entry animation
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', 'translate-y-2');
+            }, 10);
+
+            // Exit and clear
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-2px]');
+                setTimeout(() => { toast.remove(); }, 300);
+            }, 3000);
+        }
+
         function calculateExpression(text) {
             if (!text || !text.trim()) return 0;
             try {
+                // Keep only numbers, basic arithmetic symbols
                 const sanitized = String(text).replace(/[^0-9+\-*/().\s]/g, '');
                 const result = new Function(`return ${sanitized || '0'}`)();
                 return isFinite(result) ? parseFloat(result.toFixed(2)) : 0;
@@ -436,41 +604,97 @@
 
         function updateCategoryLabels() {
             const cat = inputCategory.value;
-            const l1 = document.getElementById('catLabel1'), l2 = document.getElementById('catLabel2');
-            if (cat === "Distributor") { l1.innerText = "GDP"; l2.innerText = "RRP-GDP"; perfInput2.disabled = false; }
-            else if (cat === "Dealer") { l1.innerText = "GRP"; l2.innerText = ""; perfInput2.disabled = true; perfInput2.value = ""; }
-            else { l1.innerText = "GSD"; l2.innerText = "RRP-GSD"; perfInput2.disabled = false; }
+            const l1 = document.getElementById('catLabel1');
+            const l2 = document.getElementById('catLabel2');
+            if (cat === "Distributor") { 
+                l1.innerText = "GDP"; 
+                l2.innerText = "RRP-GDP"; 
+                perfInput2.disabled = false; 
+                perfInput2.style.opacity = "1";
+            } else if (cat === "Dealer") { 
+                l1.innerText = "GRP"; 
+                l2.innerText = ""; 
+                perfInput2.disabled = true; 
+                perfInput2.value = ""; 
+                perfInput2.style.opacity = "0.4";
+            } else { 
+                l1.innerText = "GSD"; 
+                l2.innerText = "RRP-GSD"; 
+                perfInput2.disabled = false; 
+                perfInput2.style.opacity = "1";
+            }
             updateCalculations();
         }
 
-        function updateCalculations() {
-            const mobile = inputMobile.value;
-            const shop = inputShop.value;
-            const rrp = parseFloat(inputRRP.value) || 0;
-            const target = parseFloat(inputPoints.value) || 0;
-            const p1 = calculateExpression(perfInput1.value);
-            const p2 = calculateExpression(perfInput2.value);
-            
+        // Standardized Calculation Logic
+        function performEvaluation(data) {
+            const p1 = calculateExpression(data.perfVal1);
+            const p2 = calculateExpression(data.perfVal2);
             const totalPerf = p1 - p2;
+            
             let sum3M = 0; 
-            monthInputs.forEach(i => sum3M += calculateExpression(i.value));
+            data.months.forEach(m => sum3M += calculateExpression(m.val));
             
             const finalThreeMonthSum = totalPerf - sum3M;
+            const label1 = data.category === "Distributor" ? "GDP" : (data.category === "Dealer" ? "GRP" : "GSD");
 
             let status = "NOT ELIGIBLE";
-            if (rrp > target && p1 > target) status = "ELIGIBLE (RRP & " + document.getElementById('catLabel1').innerText + ")";
-            else if (rrp > target) status = "ELIGIBLE (BY RRP)";
-            else if (p1 > target) status = "ELIGIBLE (BY " + document.getElementById('catLabel1').innerText + ")";
-            else if (finalThreeMonthSum >= target) status = "ELIGIBLE (3 MONTHS)";
+            if (data.rrp >= data.target && p1 >= data.target) {
+                status = `ELIGIBLE (RRP & ${label1})`;
+            } else if (data.rrp >= data.target) {
+                status = "ELIGIBLE (BY RRP)";
+            } else if (p1 >= data.target) {
+                status = `ELIGIBLE (BY ${label1})`;
+            } else if (finalThreeMonthSum >= data.target) {
+                status = "ELIGIBLE (3 MONTHS)";
+            }
 
-            document.getElementById('previewMobile').innerText = mobile ? `${shop || 'Shop'} (${mobile})` : "-";
+            return {
+                finalThreeMonthSum,
+                status,
+                label1,
+                p1,
+                p2,
+                totalPerf,
+                sum3M
+            };
+        }
+
+        function updateCalculations() {
+            const mobile = inputMobile.value.trim();
+            const shop = inputShop.value.trim();
+            const rrp = calculateExpression(inputRRP.value);
+            const target = parseFloat(inputPoints.value) || 0;
+
+            const currentMonthsData = Array.from(monthInputs).map((input, index) => {
+                let lbl = '';
+                if (index === 0) lbl = selectMainMonth.value;
+                else if (index === 1) lbl = document.getElementById('labelMonth2').innerText;
+                else if (index === 2) lbl = document.getElementById('labelMonth3').innerText;
+                else if (index === 3) lbl = document.getElementById('labelMonth4').innerText;
+                return { label: lbl, val: input.value };
+            });
+
+            const currentDraft = {
+                category: inputCategory.value,
+                rrp: rrp,
+                target: target,
+                perfVal1: perfInput1.value,
+                perfVal2: perfInput2.value,
+                months: currentMonthsData
+            };
+
+            const evaluation = performEvaluation(currentDraft);
+
+            // Display Instant live status tracking
+            document.getElementById('previewMobile').innerText = mobile ? `${shop || 'Shop Draft'} (${mobile})` : "-";
             document.getElementById('previewRRPDisplay').innerText = mobile ? rrp.toLocaleString() : "0";
-            document.getElementById('previewGSDTotal').innerText = mobile ? p1.toLocaleString() : "0";
-            document.getElementById('preview3Months').innerText = mobile ? finalThreeMonthSum.toLocaleString() : "0";
+            document.getElementById('previewGSDTotal').innerText = mobile ? evaluation.p1.toLocaleString() : "0";
+            document.getElementById('preview3Months').innerText = mobile ? evaluation.finalThreeMonthSum.toLocaleString() : "0";
             
             const ps = document.getElementById('previewStatus');
-            ps.innerText = status;
-            ps.className = "text-center px-4 " + (status.includes("ELIGIBLE") ? "status-eligible" : "status-not-eligible");
+            ps.innerText = evaluation.status;
+            ps.className = "text-center px-4 " + (evaluation.status.includes("ELIGIBLE") ? "status-eligible" : "status-not-eligible");
         }
 
         function clearCurrentForm() {
@@ -481,70 +705,450 @@
             inputRRP.value = "";
             perfInput1.value = "";
             perfInput2.value = "";
+            editIndex = null;
+            document.querySelector('#btnCommit span').innerText = "Commit Record";
+            
             monthInputs.forEach(i => {
                 i.value = "";
-                i.closest('.smart-cell-container').classList.remove('has-sum');
-                i.closest('.smart-cell-container').querySelector('.sum-indicator').innerText = "0";
+                const container = i.closest('.smart-cell-container');
+                container.classList.remove('has-sum');
+                container.querySelector('.sum-indicator').innerText = "0";
             });
             updateCalculations();
+            showToast("Form cleared successfully.", "info");
             inputMobile.focus();
         }
 
         function addRow() {
-            if (!inputMobile.value) return;
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${inputShop.value || '-'}</td>
-                <td>${inputMobile.value}</td>
-                <td class="text-xs">${inputCity.value || '-'} / ${inputDistrict.value || '-'}</td>
-                <td>${document.getElementById('previewRRPDisplay').innerText}</td>
-                <td>${document.getElementById('preview3Months').innerText}</td>
-                <td>${document.getElementById('previewGSDTotal').innerText}</td>
-                <td class="p-2"><div class="${document.getElementById('previewStatus').className}">${document.getElementById('previewStatus').innerText}</div></td>
-            `;
-            recordsBody.insertBefore(tr, recordsBody.firstChild);
+            const mobile = inputMobile.value.trim();
+            if (!mobile) {
+                showToast("Please enter a Mobile Number to add or update a record.", "error");
+                return;
+            }
+
+            const currentMonthsData = Array.from(monthInputs).map((input, index) => {
+                let lbl = '';
+                if (index === 0) lbl = selectMainMonth.value;
+                else if (index === 1) lbl = document.getElementById('labelMonth2').innerText;
+                else if (index === 2) lbl = document.getElementById('labelMonth3').innerText;
+                else if (index === 3) lbl = document.getElementById('labelMonth4').innerText;
+                return { label: lbl, val: input.value };
+            });
+
+            const recordData = {
+                id: editIndex !== null ? records[editIndex].id : Date.now(),
+                shop: inputShop.value.trim() || 'No Shop Name',
+                mobile: mobile,
+                city: inputCity.value.trim() || '-',
+                district: inputDistrict.value.trim() || '-',
+                category: inputCategory.value,
+                rrp: calculateExpression(inputRRP.value),
+                target: parseFloat(inputPoints.value) || 3000,
+                perfVal1: perfInput1.value,
+                perfVal2: perfInput2.value,
+                months: currentMonthsData,
+                mainMonth: selectMainMonth.value
+            };
+
+            if (editIndex !== null) {
+                records[editIndex] = recordData;
+                showToast(`Record for ${recordData.shop} updated.`);
+                editIndex = null;
+                document.querySelector('#btnCommit span').innerText = "Commit Record";
+            } else {
+                records.unshift(recordData);
+                showToast(`Added verification for ${recordData.shop}.`);
+            }
+
             clearCurrentForm();
+            renderTable();
+        }
+
+        function editRecord(index) {
+            editIndex = index;
+            const rec = records[index];
+            
+            inputShop.value = rec.shop;
+            inputMobile.value = rec.mobile;
+            inputCity.value = rec.city;
+            inputDistrict.value = rec.district;
+            inputCategory.value = rec.category;
+            inputRRP.value = rec.rrp;
+            inputPoints.value = rec.target;
+            perfInput1.value = rec.perfVal1;
+            perfInput2.value = rec.perfVal2;
+            selectMainMonth.value = rec.mainMonth;
+
+            handleMonthChange();
+            updateCategoryLabels();
+
+            // Populate specific month values
+            rec.months.forEach((m, idx) => {
+                monthInputs[idx].value = m.val;
+                const container = monthInputs[idx].closest('.smart-cell-container');
+                const sum = calculateExpression(m.val);
+                container.querySelector('.sum-indicator').innerText = sum;
+                if (String(m.val).includes('+')) {
+                    container.classList.add('has-sum');
+                } else {
+                    container.classList.remove('has-sum');
+                }
+            });
+
+            document.querySelector('#btnCommit span').innerText = "Update Record";
+            showToast(`Editing entry for ${rec.shop}. Correct values and press Enter or click 'Update Record' to commit.`, "info");
+            updateCalculations();
+        }
+
+        function deleteRecord(index) {
+            const removed = records.splice(index, 1);
+            showToast(`Deleted evaluation for ${removed[0].shop}.`, "error");
+            renderTable();
+            updateCalculations();
         }
 
         function clearAll() {
-            recordsBody.innerHTML = '';
-            initEmptyRows();
-            updateCalculations();
+            records = [];
+            renderTable();
+            clearCurrentForm();
+            showToast("Database successfully wiped.", "error");
         }
 
-        function printReport() {
-            if (!inputMobile.value) return;
-            const status = document.getElementById('previewStatus').innerText;
-            const isEligible = status.includes("ELIGIBLE");
-            document.getElementById('pdfMobile').innerText = inputMobile.value;
-            document.getElementById('pdfCategory').innerText = inputCategory.value || "-";
-            document.getElementById('pdfShop').innerText = inputShop.value || "-";
-            document.getElementById('pdfCity').innerText = inputCity.value || "-";
-            document.getElementById('pdfDistrict').innerText = inputDistrict.value || "-";
-            document.getElementById('pdfRRP').innerText = inputRRP.value || "0";
-            document.getElementById('pdfGSD').innerText = calculateExpression(perfInput1.value) || "0";
-            document.getElementById('pdf3Months').innerText = document.getElementById('preview3Months').innerText;
-            document.getElementById('pdfGSDLabel').innerText = document.getElementById('catLabel1').innerText;
-            document.getElementById('pdfStatusColor').style.backgroundColor = isEligible ? "#ff0000" : "#ffffff";
+        function renderTable() {
+            const query = document.getElementById('tableSearch').value.toLowerCase().trim();
+            recordsBody.innerHTML = '';
+            clearSelection();
+
+            const filteredRecords = records.filter(rec => {
+                return rec.shop.toLowerCase().includes(query) || rec.mobile.includes(query) || rec.city.toLowerCase().includes(query);
+            });
+
+            if (filteredRecords.length === 0) {
+                // If no actual records, show visual placeholder rows (not selectable)
+                for(let i=0; i<6; i++) {
+                    const tr = document.createElement('tr');
+                    tr.className = "opacity-30 h-11";
+                    tr.innerHTML = `
+                        <td class="text-slate-400 italic">${i === 0 ? 'Empty' : ''}</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    `;
+                    recordsBody.appendChild(tr);
+                }
+                return;
+            }
+
+            filteredRecords.forEach((rec, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/50 transition-colors duration-150 cursor-cell select-none";
+                
+                const evaluation = performEvaluation(rec);
+                const statusBadge = evaluation.status.includes("ELIGIBLE") 
+                    ? `<span class="status-eligible">${evaluation.status}</span>` 
+                    : `<span class="status-not-eligible">${evaluation.status}</span>`;
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4" data-row="${idx}" data-col="0">
+                        <div class="font-semibold text-slate-800 pointer-events-none">${rec.shop}</div>
+                        <div class="text-xs text-slate-500 font-medium pointer-events-none">${rec.mobile}</div>
+                    </td>
+                    <td data-row="${idx}" data-col="1">
+                        <div class="text-slate-700 pointer-events-none">${rec.city}</div>
+                        <div class="text-xs text-slate-400 font-medium pointer-events-none">${rec.district}</div>
+                    </td>
+                    <td data-row="${idx}" data-col="2">
+                        <span class="px-2 py-0.5 text-xs font-semibold bg-slate-100 text-slate-700 rounded border border-slate-200 pointer-events-none">
+                            ${rec.category}
+                        </span>
+                    </td>
+                    <td class="text-right font-medium text-slate-800" data-row="${idx}" data-col="3">${rec.rrp.toLocaleString()}</td>
+                    <td class="text-right font-semibold text-blue-600" data-row="${idx}" data-col="4">${evaluation.finalThreeMonthSum.toLocaleString()}</td>
+                    <td class="text-right font-medium text-slate-800" data-row="${idx}" data-col="5">${evaluation.p1.toLocaleString()}</td>
+                    <td class="py-3 px-4" data-row="${idx}" data-col="6">${statusBadge}</td>
+                    <td class="text-center">
+                        <div class="flex items-center justify-center space-x-1.5">
+                            <button onclick="editRecord(${idx})" title="Edit" class="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4z"></path></svg>
+                            </button>
+                            <button onclick="printReport(${idx})" title="Print Report" class="p-1.5 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                            </button>
+                            <button onclick="deleteRecord(${idx})" title="Delete" class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                recordsBody.appendChild(tr);
+            });
+        }
+
+        // ==========================================
+        // SPREADSHEET CELL SELECTION ENGINE (STALLA v1.0)
+        // ==========================================
+
+        function getCleanCellText(td) {
+            let text = td.innerText || "";
+            text = text.trim();
+            // Handle double-quotes escaping for correct Excel column pasting
+            if (text.includes('\n') || text.includes('\t') || text.includes('"')) {
+                text = '"' + text.replace(/"/g, '""') + '"';
+            }
+            return text;
+        }
+
+        function clearSelection() {
+            startRow = null;
+            startCol = null;
+            currentRow = null;
+            currentCol = null;
+            document.querySelectorAll('#recordsBody td').forEach(td => {
+                td.classList.remove('cell-selected');
+            });
+        }
+
+        function updateSelectionHighlight() {
+            document.querySelectorAll('#recordsBody td').forEach(td => {
+                td.classList.remove('cell-selected');
+            });
+
+            if (startRow === null || startCol === null || currentRow === null || currentCol === null) return;
+
+            const minR = Math.min(startRow, currentRow);
+            const maxR = Math.max(startRow, currentRow);
+            const minC = Math.min(startCol, currentCol);
+            const maxC = Math.max(startCol, currentCol);
+
+            for (let r = minR; r <= maxR; r++) {
+                for (let c = minC; c <= maxC; c++) {
+                    const td = document.querySelector(`#recordsBody td[data-row="${r}"][data-col="${c}"]`);
+                    if (td) {
+                        td.classList.add('cell-selected');
+                    }
+                }
+            }
+        }
+
+        // Mouse Down Delegation
+        document.getElementById('mainRecordsTable').addEventListener('mousedown', (e) => {
+            const td = e.target.closest('td[data-row][data-col]');
+            if (!td || e.button !== 0) return; // ignore right clicks or clicks outside cell logic
+
+            isSelecting = true;
+            document.body.classList.add('selecting-cells');
+
+            startRow = parseInt(td.dataset.row);
+            startCol = parseInt(td.dataset.col);
+            currentRow = startRow;
+            currentCol = startCol;
+
+            updateSelectionHighlight();
+        });
+
+        // Mouse Move Delegation
+        document.getElementById('mainRecordsTable').addEventListener('mouseover', (e) => {
+            if (!isSelecting) return;
+            const td = e.target.closest('td[data-row][data-col]');
+            if (!td) return;
+
+            currentRow = parseInt(td.dataset.row);
+            currentCol = parseInt(td.dataset.col);
+
+            updateSelectionHighlight();
+        });
+
+        // Mouse Up listener
+        window.addEventListener('mouseup', () => {
+            if (isSelecting) {
+                isSelecting = false;
+                document.body.classList.remove('selecting-cells');
+            }
+        });
+
+        // Click outside the table clears current selection layout
+        document.addEventListener('mousedown', (e) => {
+            const table = document.getElementById('mainRecordsTable');
+            if (table && !table.contains(e.target)) {
+                clearSelection();
+            }
+        });
+
+        // Escape Key clears selection
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                clearSelection();
+            }
+        });
+
+        // Global Copy Keyboard Event interceptor (Ctrl+C / Cmd+C)
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'c') {
+                const selectedCells = document.querySelectorAll('#recordsBody td.cell-selected');
+                if (selectedCells.length > 0) {
+                    e.preventDefault(); // Stop standard browser highlighting copy
+
+                    const minR = Math.min(startRow, currentRow);
+                    const maxR = Math.max(startRow, currentRow);
+                    const minC = Math.min(startCol, currentCol);
+                    const maxC = Math.max(startCol, currentCol);
+
+                    let tsvRows = [];
+                    for (let r = minR; r <= maxR; r++) {
+                        let tsvCols = [];
+                        for (let c = minC; c <= maxC; c++) {
+                            const td = document.querySelector(`#recordsBody td[data-row="${r}"][data-col="${c}"]`);
+                            if (td) {
+                                tsvCols.push(getCleanCellText(td));
+                            } else {
+                                tsvCols.push(""); // empty spacing fallback
+                            }
+                        }
+                        tsvRows.push(tsvCols.join('\t'));
+                    }
+
+                    const tsvText = tsvRows.join('\n');
+
+                    // Standard high-reliability iframe fallback copy approach
+                    const tempTextarea = document.createElement('textarea');
+                    tempTextarea.value = tsvText;
+                    document.body.appendChild(tempTextarea);
+                    tempTextarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(tempTextarea);
+
+                    showToast(`Copied ${selectedCells.length} cells to clipboard. Ready to paste in Excel!`, "success");
+                }
+            }
+        });
+
+        // Copies current dynamic list directly to the clipboard (Full Raw List)
+        function copyTableData() {
+            if (records.length === 0) {
+                showToast("No structured rows in your current database to copy.", "error");
+                return;
+            }
+
+            let textData = "BOARD ELIGIBILITY SYSTEM CONSOLE REPORT EXPORT\n";
+            textData += "---------------------------------------------------------\n";
+            textData += "Shop Name\tMobile No.\tCity\tDistrict\tCategory\tRRP\t3-Month Diff\tTotal Base\tEligibility Status\n";
+
+            records.forEach(rec => {
+                const evalResult = performEvaluation(rec);
+                textData += `${rec.shop}\t${rec.mobile}\t${rec.city}\t${rec.district}\t${rec.category}\t${rec.rrp}\t${evalResult.finalThreeMonthSum}\t${evalResult.p1}\t${evalResult.status}\n`;
+            });
+
+            // Reliable iframe copy command
+            const el = document.createElement('textarea');
+            el.value = textData;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            showToast("Entire log database copied to clipboard!", "success");
+        }
+
+        // Handles PDF creation securely from the offscreen element to avoid layout cutoff
+        function printReport(idx = null) {
+            let data, evalDetails;
+            
+            if (idx === null) {
+                // Generate PDF using active form draft
+                if (!inputMobile.value.trim()) {
+                    showToast("Draft mobile is empty! Fill the form to print dynamic draft reports.", "error");
+                    return;
+                }
+                const currentMonthsData = Array.from(monthInputs).map((input, index) => {
+                    let lbl = '';
+                    if (index === 0) lbl = selectMainMonth.value;
+                    else if (index === 1) lbl = document.getElementById('labelMonth2').innerText;
+                    else if (index === 2) lbl = document.getElementById('labelMonth3').innerText;
+                    else if (index === 3) lbl = document.getElementById('labelMonth4').innerText;
+                    return { label: lbl, val: input.value };
+                });
+
+                data = {
+                    shop: inputShop.value.trim() || 'No Shop Name',
+                    mobile: inputMobile.value.trim(),
+                    city: inputCity.value.trim() || '-',
+                    district: inputDistrict.value.trim() || '-',
+                    category: inputCategory.value,
+                    rrp: calculateExpression(inputRRP.value),
+                    target: parseFloat(inputPoints.value) || 3000,
+                    perfVal1: perfInput1.value,
+                    perfVal2: perfInput2.value,
+                    months: currentMonthsData
+                };
+                evalDetails = performEvaluation(data);
+            } else {
+                data = records[idx];
+                evalDetails = performEvaluation(data);
+            }
+
+            const isEligible = evalDetails.status.includes("ELIGIBLE");
+            
+            document.getElementById('pdfHeaderCategory').innerText = `${data.category.toUpperCase()} ELIGIBILITY ASSESSMENT`;
+            document.getElementById('pdfMobile').innerText = data.mobile;
+            document.getElementById('pdfShop').innerText = data.shop;
+            document.getElementById('pdfCity').innerText = data.city;
+            document.getElementById('pdfDistrict').innerText = data.district;
+            document.getElementById('pdfRRP').innerText = data.rrp.toLocaleString();
+            document.getElementById('pdfGSD').innerText = evalDetails.p1.toLocaleString();
+            document.getElementById('pdf3Months').innerText = evalDetails.finalThreeMonthSum.toLocaleString();
+            document.getElementById('pdfGSDLabel').innerText = evalDetails.label1;
+            
+            const pdfStatusColor = document.getElementById('pdfStatusColor');
+            pdfStatusColor.innerText = `STATUS: ${evalDetails.status}`;
+            if (isEligible) {
+                pdfStatusColor.style.backgroundColor = "#4ade80"; // Emerald
+                pdfStatusColor.style.color = "#14532d";
+            } else {
+                pdfStatusColor.style.backgroundColor = "#f87171"; // Crimson
+                pdfStatusColor.style.color = "#7f1d1d";
+            }
 
             const element = document.getElementById('pdfTemplate');
-            element.style.display = 'block';
-            html2pdf().set({ margin: 0.5, filename: `Report_${inputMobile.value}.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(element).save().then(() => { element.style.display = 'none'; });
+            showToast("Rendering PDF Report...", "info");
+
+            const opt = {
+                margin: 0.3,
+                filename: `Verification_Report_${data.mobile}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => { 
+                showToast("PDF report successfully downloaded.");
+            });
         }
 
-        function initEmptyRows() { for(let i=0; i<15; i++) { const tr = document.createElement('tr'); tr.className = "opacity-20 h-10"; tr.innerHTML = '<td></td><td></td><td></td><td></td><td></td><td></td><td></td>'; recordsBody.appendChild(tr); } }
+        // Initialize event listeners & defaults
+        [inputMobile, inputShop, inputCity, inputDistrict, inputRRP, inputPoints, perfInput1, perfInput2].forEach(el => {
+            el.addEventListener('input', updateCalculations);
+        });
 
-        [inputMobile, inputShop, inputCity, inputDistrict, inputRRP, inputPoints, perfInput1, perfInput2].forEach(el => el.addEventListener('input', updateCalculations));
-        monthInputs.forEach(input => input.addEventListener('input', (e) => {
-            const container = e.target.closest('.smart-cell-container');
-            const sum = calculateExpression(e.target.value);
-            container.querySelector('.sum-indicator').innerText = sum;
-            if (e.target.value.includes('+')) container.classList.add('has-sum');
-            else container.classList.remove('has-sum');
-            updateCalculations();
-        }));
+        monthInputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                const container = e.target.closest('.smart-cell-container');
+                const sum = calculateExpression(e.target.value);
+                container.querySelector('.sum-indicator').innerText = sum;
+                if (e.target.value.includes('+')) {
+                    container.classList.add('has-sum');
+                } else {
+                    container.classList.remove('has-sum');
+                }
+                updateCalculations();
+            });
+        });
 
-        initEmptyRows();
+        // Initialize view state
+        renderTable();
         handleMonthChange();
         updateCategoryLabels();
     </script>
