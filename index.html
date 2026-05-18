@@ -482,37 +482,33 @@
         }
 
         function updateCalculations() {
-            const rrp = parseFloat(rrpEl.value) || 0;
-            const target = parseFloat(targetEl.value) || 0;
-            const p1 = parse(p1El.value);
-            const p2 = parse(p2El.value);
-            const actualTotal = p1 - p2;
-
-            let monthSum = 0;
-            monthInputs.forEach(i => monthSum += parse(i.value));
-            const final3M = actualTotal - monthSum;
-
-            // COMBINED ELIGIBILITY LOGIC
-            let eligibilityReasons = [];
-            if (rrp >= target) eligibilityReasons.push("RRP");
-            if (p1 >= target) eligibilityReasons.push(document.getElementById('catLabel1').innerText);
-            if (final3M >= target) eligibilityReasons.push("3M");
-
-            let status = eligibilityReasons.length > 0 
-                ? "ELIGIBLE (" + eligibilityReasons.join(" & ") + ")" 
-                : "NOT ELIGIBLE";
-
-            document.getElementById('prevShop').innerText = mobileEl.value ? `${shopEl.value || 'Shop'} (${mobileEl.value})` : "-";
-            document.getElementById('prevRRP').innerText = rrp.toLocaleString();
-            document.getElementById('prevActual').innerText = actualTotal.toLocaleString();
-            document.getElementById('prevFinal').innerText = final3M.toLocaleString();
+             const mobile = inputMobile.value;
+            const shop = inputShop.value;
+            const rrp = parseFloat(inputRRP.value) || 0;
+            const target = parseFloat(inputPoints.value) || 0;
+            const p1 = calculateExpression(perfInput1.value);
+            const p2 = calculateExpression(perfInput2.value);
             
-            const ps = document.getElementById('prevStatus');
-            ps.innerText = status;
-            ps.className = status.includes("ELIGIBLE") ? "status-eligible" : "status-not-eligible";
+            const totalPerf = p1 - p2;
+            let sum3M = 0; 
+            monthInputs.forEach(i => sum3M += calculateExpression(i.value));
+            
+            const finalThreeMonthSum = totalPerf - sum3M;
 
-            return { rrp, actualTotal, final3M, status };
-        }
+            let status = "NOT ELIGIBLE";
+            if (rrp > target && p1 > target) status = "ELIGIBLE (RRP & " + document.getElementById('catLabel1').innerText + ")";
+            else if (rrp > target) status = "ELIGIBLE (BY RRP)";
+            else if (p1 > target) status = "ELIGIBLE (BY " + document.getElementById('catLabel1').innerText + ")";
+            else if (finalThreeMonthSum >= target) status = "ELIGIBLE (3 MONTHS)";
+
+            document.getElementById('previewMobile').innerText = mobile ? `${shop || 'Shop'} (${mobile})` : "-";
+            document.getElementById('previewRRPDisplay').innerText = mobile ? rrp.toLocaleString() : "0";
+            document.getElementById('previewGSDTotal').innerText = mobile ? p1.toLocaleString() : "0";
+            document.getElementById('preview3Months').innerText = mobile ? finalThreeMonthSum.toLocaleString() : "0";
+            
+            const ps = document.getElementById('previewStatus');
+            ps.innerText = status;
+            ps.className = "text-center px-4 " + (status.includes("ELIGIBLE") ? "status-eligible" : "status-not-eligible");
 
         function addRecord() {
             if (!mobileEl.value) return;
@@ -601,29 +597,23 @@
         }
 
         function printReport() {
-            if (!mobileEl.value) return;
-            const res = updateCalculations();
-            
-            // Sync PDF Data
-            document.getElementById('pdfMobile').innerText = mobileEl.value;
-            document.getElementById('pdfShop').innerText = shopEl.value || "-";
-            document.getElementById('pdfLocation').innerText = `${cityEl.value}, ${distEl.value}`;
-            document.getElementById('pdfValRRP').innerText = res.rrp.toLocaleString();
-            document.getElementById('pdfValActual').innerText = res.actualTotal.toLocaleString();
-            document.getElementById('pdfValFinal').innerText = res.final3M.toLocaleString();
-            document.getElementById('pdfCatHeader').innerText = document.getElementById('catLabel1').innerText;
-            
-            const bar = document.getElementById('pdfStatusBar');
-            bar.innerText = res.status;
-            bar.style.backgroundColor = res.status.includes("ELIGIBLE") ? "#059669" : "#dc2626";
+            if (!inputMobile.value) return;
+            const status = document.getElementById('previewStatus').innerText;
+            const isEligible = status.includes("ELIGIBLE");
+            document.getElementById('pdfMobile').innerText = inputMobile.value;
+            document.getElementById('pdfCategory').innerText = inputCategory.value || "-";
+            document.getElementById('pdfShop').innerText = inputShop.value || "-";
+            document.getElementById('pdfCity').innerText = inputCity.value || "-";
+            document.getElementById('pdfDistrict').innerText = inputDistrict.value || "-";
+            document.getElementById('pdfRRP').innerText = inputRRP.value || "0";
+            document.getElementById('pdfGSD').innerText = calculateExpression(perfInput1.value) || "0";
+            document.getElementById('pdf3Months').innerText = document.getElementById('preview3Months').innerText;
+            document.getElementById('pdfGSDLabel').innerText = document.getElementById('catLabel1').innerText;
+            document.getElementById('pdfStatusColor').style.backgroundColor = isEligible ? "#ff0000" : "#ffffff";
 
             const element = document.getElementById('pdfTemplate');
-            const opt = {
-                margin: 0.2,
-                filename: `Eligibility_${mobileEl.value}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            element.style.display = 'block';
+            html2pdf().set({ margin: 0.5, filename: `Report_${inputMobile.value}.pdf`, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } }).from(element).save().then(() => { element.style.display = 'none'; });
             };
 
             // Capture the element
